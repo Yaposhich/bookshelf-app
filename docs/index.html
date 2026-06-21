@@ -234,7 +234,7 @@
 
   <header class="hero">
     <div>
-      <div class="eyebrow">Для macOS · версія 1.0.5</div>
+      <div class="eyebrow" id="hero-version">Для macOS · версія 1.0.5</div>
       <h1>Бібліотека<br>для тих, хто<br><em>дочитує</em> книги.</h1>
       <p class="lede">Bookshelf веде облік прочитаного, рахує сторінки та зберігає цитати — без акаунту, реклами чи хмари. Все залишається на твоєму Mac.</p>
       <div class="cta-row">
@@ -384,6 +384,7 @@
     if (intel) document.getElementById('dl-intel').href = intel.browser_download_url;
     if (version) {
       document.getElementById('version-tag').textContent = `Версія ${version} · оновлюється автоматично після встановлення`;
+      document.getElementById('hero-version').textContent = `Для macOS · версія ${version}`;
     }
   } catch (e) {
     // Fallback: links already point to /releases/latest, which GitHub redirects correctly
