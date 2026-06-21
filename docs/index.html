@@ -335,7 +335,7 @@
       <p class="section-sub">Обери версію під свій Mac. Не впевнений який чіп — дивись <span style="white-space:nowrap"></span><b>About This Mac</b> в меню .</p>
 
       <div class="platform-cards">
-        <a class="platform-card" href="https://github.com/Yaposhich/bookshelf-app/releases/download/v1.0.5/Bookshelf-1.0.5-arm64.dmg">
+        <a class="platform-card" href="https://github.com/Yaposhich/bookshelf-app/releases/latest" id="dl-arm64">
           <div class="chip-row">
             <span class="chip recommended">Рекомендовано</span>
             <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
@@ -344,7 +344,7 @@
           <div class="pdesc">M1, M2, M3, M4 — Mac з 2020 року й новіші</div>
         </a>
 
-        <a class="platform-card" href="https://github.com/Yaposhich/bookshelf-app/releases/download/v1.0.5/Bookshelf-1.0.5.dmg">
+        <a class="platform-card" href="https://github.com/Yaposhich/bookshelf-app/releases/latest" id="dl-intel">
           <div class="chip-row">
             <span class="chip">Intel</span>
             <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
@@ -354,7 +354,7 @@
         </a>
       </div>
 
-      <div class="version-tag">Версія 1.0.5 · оновлюється автоматично після встановлення</div>
+      <div class="version-tag" id="version-tag">Завантаження найновішої версії · оновлюється автоматично після встановлення</div>
     </div>
   </section>
 </div>
@@ -368,6 +368,28 @@
     </div>
   </footer>
 </div>
+
+<script>
+(async function() {
+  try {
+    const res = await fetch('https://api.github.com/repos/Yaposhich/bookshelf-app/releases/latest');
+    const data = await res.json();
+    const version = (data.tag_name || '').replace(/^v/, '');
+    const assets = data.assets || [];
+
+    const arm64 = assets.find(a => a.name.endsWith('-arm64.dmg'));
+    const intel = assets.find(a => a.name.endsWith('.dmg') && !a.name.includes('arm64'));
+
+    if (arm64) document.getElementById('dl-arm64').href = arm64.browser_download_url;
+    if (intel) document.getElementById('dl-intel').href = intel.browser_download_url;
+    if (version) {
+      document.getElementById('version-tag').textContent = `Версія ${version} · оновлюється автоматично після встановлення`;
+    }
+  } catch (e) {
+    // Fallback: links already point to /releases/latest, which GitHub redirects correctly
+  }
+})();
+</script>
 
 </body>
 </html>
