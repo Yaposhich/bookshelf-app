@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bookshelf — особиста бібліотека для macOS</title>
+<meta name="description" content="Веди облік прочитаних книг, став оцінки, записуй цитати. Локально, приватно, без акаунту." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161310;
+    --ink-soft:#4a443d;
+    --paper:#f6f1e7;
+    --paper-warm:#efe6d4;
+    --rule:#ddd2ba;
+    --spine:#8b6b4a;
+    --spine-deep:#5e4630;
+    --accent:#8b7cf8;
+    --accent-deep:#6d5ee0;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(22,19,16,0.045) 1px, transparent 0);
+    background-size:22px 22px;
+    pointer-events:none;
+    z-index:0;
+  }
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+  /* ───────── Nav ───────── */
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px 0;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:-0.01em}
+  .brand-mark{
+    width:30px;height:30px;border-radius:7px;
+    background:linear-gradient(155deg,var(--spine),var(--spine-deep));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 6px rgba(94,70,48,0.35);
+  }
+  .brand-mark svg{width:15px;height:15px}
+  .nav-links{display:flex;gap:32px;font-size:14px;color:var(--ink-soft)}
+  .nav-links a{text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s,color .15s;padding-bottom:2px}
+  .nav-links a:hover{color:var(--ink);border-color:var(--ink-soft)}
+
+  /* ───────── Hero ───────── */
+  .hero{padding:88px 0 64px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;letter-spacing:0.07em;text-transform:uppercase;
+    color:var(--spine-deep);font-weight:600;margin-bottom:22px;
+  }
+  .eyebrow::before{content:'';width:18px;height:1px;background:var(--spine-deep)}
+  h1{
+    font-family:var(--serif);
+    font-size:clamp(40px,5.4vw,66px);
+    line-height:1.04;
+    font-weight:600;
+    letter-spacing:-0.02em;
+    margin-bottom:24px;
+  }
+  h1 em{
+    font-style:italic;font-weight:500;
+    color:var(--spine-deep);
+  }
+  .lede{
+    font-size:18px;line-height:1.65;color:var(--ink-soft);
+    max-width:46ch;margin-bottom:36px;
+  }
+  .cta-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+  .btn-primary{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--ink);color:var(--paper);
+    padding:15px 26px;border-radius:11px;
+    font-size:15px;font-weight:500;text-decoration:none;
+    transition:transform .15s ease, background .15s ease;
+    box-shadow:0 6px 18px rgba(22,19,16,0.18);
+  }
+  .btn-primary:hover{transform:translateY(-1px);background:#000}
+  .btn-primary svg{width:17px;height:17px;flex-shrink:0}
+  .btn-secondary{
+    font-size:14px;color:var(--ink-soft);text-decoration:none;
+    border-bottom:1px solid var(--rule);padding-bottom:2px;
+    transition:border-color .15s,color .15s;
+  }
+  .btn-secondary:hover{color:var(--ink);border-color:var(--ink)}
+  .req-note{font-size:12.5px;color:#8a8071;margin-top:2px}
+
+  /* ───────── Hero visual: stacked book spines ───────── */
+  .shelf-art{position:relative;height:360px;display:flex;align-items:flex-end;justify-content:center}
+  .shelf-base{
+    position:absolute;bottom:18px;left:6%;right:6%;height:14px;
+    background:linear-gradient(180deg,#d8cba9,#c7b88f);
+    border-radius:3px;
+    box-shadow:0 10px 22px rgba(94,70,48,0.28);
+  }
+  .spines{display:flex;align-items:flex-end;gap:7px;position:relative;z-index:1;padding-bottom:14px}
+  .spine{
+    width:30px;border-radius:3px 3px 1px 1px;
+    box-shadow: inset 1px 0 0 rgba(255,255,255,0.18), inset -1px 0 0 rgba(0,0,0,0.12), 0 3px 8px rgba(22,19,16,0.18);
+    position:relative;
+    animation:settle .7s cubic-bezier(.2,.9,.25,1) backwards;
+  }
+  .spine span{
+    position:absolute;top:14px;left:50%;transform:translateX(-50%) rotate(0deg);
+    font-family:var(--serif);font-size:9.5px;font-weight:600;letter-spacing:0.04em;
+    color:rgba(255,255,255,0.85);white-space:nowrap;
+  }
+  @keyframes settle{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .spine:nth-child(1){height:230px;background:linear-gradient(160deg,#c4583f,#9c3f2c);animation-delay:.02s}
+  .spine:nth-child(2){height:280px;background:linear-gradient(160deg,#3d6e63,#284a42);animation-delay:.08s}
+  .spine:nth-child(3){height:200px;background:linear-gradient(160deg,var(--accent),var(--accent-deep));animation-delay:.14s}
+  .spine:nth-child(4){height:260px;background:linear-gradient(160deg,#d4a23b,#b07f22);animation-delay:.2s}
+  .spine:nth-child(5){height:215px;background:linear-gradient(160deg,#5e4630,#41301f);animation-delay:.26s}
+  .spine:nth-child(6){height:245px;background:linear-gradient(160deg,#7d8ca8,#56657f);animation-delay:.32s}
+  .spine:nth-child(7){height:190px;background:linear-gradient(160deg,#9c3f2c,#742d1e);animation-delay:.38s}
+
+  /* ───────── Section frame ───────── */
+  section{padding:74px 0}
+  .section-head{max-width:560px;margin-bottom:48px}
+  .section-eyebrow{font-size:12.5px;letter-spacing:0.07em;text-transform:uppercase;color:var(--spine-deep);font-weight:600;margin-bottom:14px}
+  h2{font-family:var(--serif);font-size:clamp(28px,3.4vw,38px);font-weight:600;letter-spacing:-0.015em;line-height:1.12;margin-bottom:14px}
+  .section-sub{font-size:16px;color:var(--ink-soft);line-height:1.6}
+
+  /* ───────── Features: index-card layout ───────── */
+  .features{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    border-top:1px solid var(--rule);
+  }
+  .feat{
+    padding:30px 28px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);
+    position:relative;
+  }
+  .feat:nth-child(3n){border-right:none}
+  .feat-num{font-family:var(--serif);font-size:13px;color:#a89b80;font-weight:600;margin-bottom:18px;display:block}
+  .feat h3{font-family:var(--serif);font-size:19px;font-weight:600;margin-bottom:9px;letter-spacing:-0.01em}
+  .feat p{font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+
+  /* ───────── Privacy strip ───────── */
+  .privacy{
+    background:var(--ink);color:var(--paper);
+    border-radius:20px;padding:52px 48px;
+    display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;
+  }
+  .privacy h2{color:var(--paper)}
+  .privacy .section-sub{color:#cfc7b8}
+  .privacy-list{display:flex;flex-direction:column;gap:14px;font-size:14px;min-width:230px}
+  .privacy-item{display:flex;align-items:center;gap:10px}
+  .privacy-item svg{width:16px;height:16px;flex-shrink:0;color:var(--accent)}
+
+  /* ───────── Download ───────── */
+  .download{
+    border:1px solid var(--rule);border-radius:20px;
+    padding:54px 48px;text-align:center;
+    background:var(--paper-warm);
+  }
+  .download h2{margin-bottom:10px}
+  .download .section-sub{margin:0 auto 36px;max-width:440px}
+  .platform-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:22px}
+  .platform-card{
+    width:240px;text-align:left;
+    background:var(--paper);border:1px solid var(--rule);border-radius:14px;
+    padding:22px 22px 20px;
+    transition:border-color .15s, transform .15s;
+    text-decoration:none;color:var(--ink);
+    display:block;
+  }
+  .platform-card:hover{border-color:var(--spine);transform:translateY(-2px)}
+  .platform-card .chip-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .platform-card .chip{
+    font-size:11px;letter-spacing:0.04em;text-transform:uppercase;font-weight:600;
+    color:#fff;background:var(--spine-deep);padding:3px 9px;border-radius:20px;
+  }
+  .platform-card .chip.recommended{background:var(--accent-deep)}
+  .platform-card .arrow{width:16px;height:16px;color:#a89b80;transition:transform .15s}
+  .platform-card:hover .arrow{transform:translate(2px,-2px);color:var(--ink)}
+  .platform-card .ptitle{font-family:var(--serif);font-size:18px;font-weight:600;margin-bottom:4px}
+  .platform-card .pdesc{font-size:13px;color:var(--ink-soft)}
+  .version-tag{font-size:12.5px;color:#8a8071}
+
+  /* ───────── Footer ───────── */
+  footer{border-top:1px solid var(--rule);padding:36px 0 48px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#8a8071}
+  footer a{text-decoration:none;border-bottom:1px solid transparent}
+  footer a:hover{color:var(--ink);border-color:var(--ink)}
+  .footer-links{display:flex;gap:24px}
+
+  /* ───────── Responsive ───────── */
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;gap:40px;padding:56px 0 40px}
+    .shelf-art{height:260px;order:-1}
+    .spine{width:24px}
+    .features{grid-template-columns:1fr}
+    .feat{border-right:none}
+    .privacy{grid-template-columns:1fr;text-align:left}
+    .download{padding:40px 22px}
+    .nav-links{display:none}
+    footer{flex-direction:column;gap:14px;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <div class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 4.5C4 3.67 4.67 3 5.5 3H11V21H5.5C4.67 21 4 20.33 4 19.5V4.5Z" fill="#f6f1e7"/><path d="M13 3H18.5C19.33 3 20 3.67 20 4.5V19.5C20 20.33 19.33 21 18.5 21H13V3Z" fill="#f6f1e7" fill-opacity="0.65"/></svg>
+      </span>
+      Bookshelf
+    </div>
+    <div class="nav-links">
+      <a href="#features">Можливості</a>
+      <a href="#privacy">Приватність</a>
+      <a href="#download">Завантажити</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Для macOS · версія 1.0.5</div>
+      <h1>Бібліотека<br>для тих, хто<br><em>дочитує</em> книги.</h1>
+      <p class="lede">Bookshelf веде облік прочитаного, рахує сторінки та зберігає цитати — без акаунту, реклами чи хмари. Все залишається на твоєму Mac.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="#download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3M12 17l-5-5M12 17l5-5"/><path d="M4 21h16"/></svg>
+          Завантажити для Mac
+        </a>
+        <a class="btn-secondary" href="#features">Що вміє застосунок →</a>
+      </div>
+      <div class="req-note">Безкоштовно · macOS 11 Big Sur і новіше</div>
+    </div>
+
+    <div class="shelf-art" aria-hidden="true">
+      <div class="shelf-base"></div>
+      <div class="spines">
+        <div class="spine"><span style="writing-mode:vertical-rl">Орвелл</span></div>
+        <div class="spine"><span style="writing-mode:vertical-rl">Кларк</span></div>
+        <div class="spine"><span style="writing-mode:vertical-rl">Кутзее</span></div>
+        <div class="spine"><span style="writing-mode:vertical-rl">Совелл</span></div>
+        <div class="spine"><span style="writing-mode:vertical-rl">Лем</span></div>
+        <div class="spine"><span style="writing-mode:vertical-rl">Гессе</span></div>
+        <div class="spine"><span style="writing-mode:vertical-rl">Кафка</span></div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<div class="wrap">
+  <section id="features">
+    <div class="section-head">
+      <div class="section-eyebrow">Можливості</div>
+      <h2>Все, що потрібно читачу — і нічого зайвого</h2>
+      <p class="section-sub">Жодних соцмереж, стрічок чи сповіщень. Тільки твоя бібліотека.</p>
+    </div>
+
+    <div class="features">
+      <div class="feat">
+        <span class="feat-num">01</span>
+        <h3>Прогрес читання</h3>
+        <p>Познач сторінку на якій зупинився — застосунок порахує відсоток і збереже історію по днях.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-num">02</span>
+        <h3>Оцінки та мова</h3>
+        <p>П'ять зірок, мова якою читав, рік прочитання. Фільтруй бібліотеку як завгодно.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-num">03</span>
+        <h3>Цитати з книг</h3>
+        <p>Виписуй уривки прямо під час читання — з номером сторінки і власною нотаткою.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-num">04</span>
+        <h3>Полиці</h3>
+        <p>Створюй власні добірки — "Перечитати влітку", "Подарувати другу" — з іконкою і кольором.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-num">05</span>
+        <h3>Пошук книг</h3>
+        <p>Підтягуй назву, автора, обкладинку і кількість сторінок з Google Books одним кліком.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-num">06</span>
+        <h3>Read Later</h3>
+        <p>Список "прочитати згодом" окремо від прочитаного — щоб нічого не загубилось.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="privacy">
+      <div>
+        <div class="section-eyebrow" style="color:var(--accent)">Приватність</div>
+        <h2>Твоя бібліотека — тільки твоя.</h2>
+        <p class="section-sub">Дані зберігаються локально на диску. Без серверів, без акаунтів, без аналітики яку б ти не дозволив.</p>
+      </div>
+      <div class="privacy-list">
+        <div class="privacy-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+          Працює повністю офлайн
+        </div>
+        <div class="privacy-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+          Без реєстрації й пароля
+        </div>
+        <div class="privacy-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+          Експорт усіх даних в один клік
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download">
+    <div class="download">
+      <div class="section-eyebrow" style="justify-content:center;display:flex">Завантажити</div>
+      <h2>Готовий почати?</h2>
+      <p class="section-sub">Обери версію під свій Mac. Не впевнений який чіп — дивись <span style="white-space:nowrap"></span><b>About This Mac</b> в меню .</p>
+
+      <div class="platform-cards">
+        <a class="platform-card" href="https://github.com/Yaposhich/bookshelf-app/releases/download/v1.0.5/Bookshelf-1.0.5-arm64.dmg">
+          <div class="chip-row">
+            <span class="chip recommended">Рекомендовано</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </div>
+          <div class="ptitle">Apple Silicon</div>
+          <div class="pdesc">M1, M2, M3, M4 — Mac з 2020 року й новіші</div>
+        </a>
+
+        <a class="platform-card" href="https://github.com/Yaposhich/bookshelf-app/releases/download/v1.0.5/Bookshelf-1.0.5.dmg">
+          <div class="chip-row">
+            <span class="chip">Intel</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+          </div>
+          <div class="ptitle">Intel Mac</div>
+          <div class="pdesc">Mac випущені до 2020 року</div>
+        </a>
+      </div>
+
+      <div class="version-tag">Версія 1.0.5 · оновлюється автоматично після встановлення</div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <footer>
+    <span>Bookshelf — особистий проєкт, не пов'язаний з жодним видавництвом.</span>
+    <div class="footer-links">
+      <a href="https://github.com/Yaposhich/bookshelf-app">Код на GitHub</a>
+      <a href="https://github.com/Yaposhich/bookshelf-app/releases">Усі версії</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
