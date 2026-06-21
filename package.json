@@ -1,0 +1,41 @@
+{
+  "name": "bookshelf-app",
+  "version": "1.0.0",
+  "description": "Особиста бібліотека книг",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron:dev": "electron .",
+    "start": "concurrently \"vite\" \"electron .\"",
+    "dist": "vite build && electron-builder"
+  },
+  "build": {
+    "appId": "com.bookshelf.app",
+    "productName": "Bookshelf",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": "dmg"
+    },
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "node_modules/better-sqlite3/**/*"
+    ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^8.2.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
