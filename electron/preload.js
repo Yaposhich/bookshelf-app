@@ -37,4 +37,14 @@ contextBridge.exposeInMainWorld('api', {
   // Tags & Stats
   getTags:        ()             => ipcRenderer.invoke('tags:getAll'),
   getStats:       ()             => ipcRenderer.invoke('stats:get'),
+
+  // Auto-updater
+  checkForUpdate:  ()            => ipcRenderer.invoke('updater:checkNow'),
+  installUpdate:   ()            => ipcRenderer.invoke('updater:installNow'),
+  openUpdateLog:   ()            => ipcRenderer.invoke('updater:openErrorLog'),
+  onUpdaterStatus: (callback)    => {
+    const handler = (_, data) => callback(data)
+    ipcRenderer.on('updater:status', handler)
+    return () => ipcRenderer.removeListener('updater:status', handler)
+  },
 })

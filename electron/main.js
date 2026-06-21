@@ -3,6 +3,7 @@ const path = require('path')
 const fs   = require('fs')
 const { randomUUID } = require('crypto')
 const Database = require('better-sqlite3')
+const { autoUpdater } = require('electron-updater')
 
 const userDataPath = app.getPath('userData')
 const dbPath = path.join(userDataPath, 'bookshelf.db')
@@ -646,8 +647,10 @@ ipcMain.handle('analytics:exportFile', async () => {
 })
 
 // ─── Window ───────────────────────────────────────────────────────
+let mainWindow
+
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200, height: 800, minWidth: 900, minHeight: 600,
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0f0f0f',
@@ -658,13 +661,77 @@ function createWindow() {
       webSecurity: false
     }
   })
-  if (!app.isPackaged) win.loadURL('http://localhost:5173')
-  else win.loadFile(path.join(__dirname, '../dist/index.html'))
+  if (!app.isPackaged) mainWindow.loadURL('http://localhost:5173')
+  else mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
 }
+
+// ─── Auto-updater ───────────────────────────────────────────────────
+function setupAutoUpdater() {
+  if (!app.isPackaged) return // skip in dev mode
+
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = true
+
+  const send = (channel, data) => {
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send(channel, data)
+  }
+
+  autoUpdater.on('update-available', (info) => {
+    send('updater:status', { state: 'available', version: info.version })
+  })
+
+  autoUpdater.on('update-not-available', () => {
+    send('updater:status', { state: 'not-available' })
+  })
+
+  autoUpdater.on('download-progress', (progress) => {
+    send('updater:status', { state: 'downloading', percent: Math.round(progress.percent) })
+  })
+
+  autoUpdater.on('update-downloaded', (info) => {
+    send('updater:status', { state: 'ready', version: info.version })
+  })
+
+  autoUpdater.on('error', (err) => {
+    send('updater:status', { state: 'error', message: err.message })
+  })
+
+  // Check on launch, then every 4 hours
+  autoUpdater.checkForUpdates().catch(() => {})
+  setInterval(() => autoUpdater.checkForUpdates().catch(() => {}), 4 * 60 * 60 * 1000)
+}
+
+ipcMain.handle('updater:installNow', () => {
+  autoUpdater.quitAndInstall()
+})
+
+ipcMain.handle('updater:checkNow', async () => {
+  if (!app.isPackaged) return { dev: true }
+  try {
+    await autoUpdater.checkForUpdates()
+    return { ok: true }
+  } catch(e) {
+    const errorDetail = `${e.message}\n\nStack:\n${e.stack || 'no stack'}`
+    try {
+      fs.writeFileSync(path.join(userDataPath, 'update-error.log'), errorDetail, 'utf8')
+    } catch {}
+    return { error: e.message }
+  }
+})
+
+ipcMain.handle('updater:openErrorLog', () => {
+  const logPath = path.join(userDataPath, 'update-error.log')
+  if (fs.existsSync(logPath)) {
+    require('electron').shell.showItemInFolder(logPath)
+    return { path: logPath }
+  }
+  return { error: 'no log' }
+})
 
 app.whenReady().then(() => {
   initDB()
   createWindow()
+  setupAutoUpdater()
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })

@@ -7,6 +7,7 @@ import Stats     from './components/Stats'
 import Quotes    from './components/Quotes'
 import Settings  from './components/Settings'
 import Shelves   from './components/Shelves'
+import UpdateBanner from './components/UpdateBanner'
 
 // ── Translations ───────────────────────────────────────────────────
 const T = {
@@ -197,6 +198,8 @@ export default function App() {
           )}
         </div>
       </div>
+
+      <UpdateBanner lang={lang} />
 
       {modalOpen && <BookModal book={editBook} onSave={handleSave} onClose={closeModal} />}
 

@@ -91,9 +91,27 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
   const [importStatus, setImportStatus] = useState(null)
   const [importMsg, setImportMsg]       = useState('')
   const [analyticsStatus, setAnalyticsStatus] = useState(null)
+  const [updateMsg, setUpdateMsg]       = useState('')
 
   const t = T[TRANSLATED.has(lang) ? lang : 'en']
   const current = LANG_OPTIONS.find(o => o.value === lang)
+  const uk = lang !== 'en'
+
+  const handleCheckUpdate = async () => {
+    setUpdateMsg(uk ? 'Перевіряю...' : 'Checking...')
+    track('feature:check_update')
+    const res = await window.api.checkForUpdate()
+    if (res?.dev) {
+      setUpdateMsg(uk ? 'Недоступно в режимі розробки' : 'Not available in dev mode')
+      setTimeout(() => setUpdateMsg(''), 4000)
+    } else if (res?.error) {
+      setUpdateMsg(`${uk ? 'Помилка' : 'Error'}: ${res.error}`)
+      // do not auto-hide errors — user needs to read/copy them
+    } else {
+      setUpdateMsg(uk ? '✓ Перевірено' : '✓ Checked')
+      setTimeout(() => setUpdateMsg(''), 4000)
+    }
+  }
 
   const handleLang = (val) => {
     setLang(val)
@@ -253,10 +271,35 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
       {/* ── About ── */}
       <Section title={t.about}>
         <div style={{fontSize:13,color:'var(--text2)',display:'flex',flexDirection:'column',gap:6}}>
-          <div style={{display:'flex',justifyContent:'space-between'}}>
-            <span style={{color:'var(--text3)'}}>{t.version}</span><span>1.0.0</span>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{color:'var(--text3)'}}>{t.version}</span><span>1.0.1</span>
           </div>
           <div style={{marginTop:4,color:'var(--text3)',fontSize:12}}>{t.builtWith}</div>
+          <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <button className="btn" onClick={handleCheckUpdate}>
+                {uk ? '🔄 Перевірити оновлення' : '🔄 Check for updates'}
+              </button>
+              {updateMsg && !updateMsg.startsWith('Error') && !updateMsg.startsWith('Помилка') && (
+                <span style={{fontSize:12,color:'var(--text3)'}}>{updateMsg}</span>
+              )}
+            </div>
+            {updateMsg && (updateMsg.startsWith('Error') || updateMsg.startsWith('Помилка')) && (
+              <div style={{
+                background:'var(--red-bg)', border:'1px solid var(--red)', borderRadius:'var(--radius)',
+                padding:'10px 12px', fontSize:12, color:'var(--text)', lineHeight:1.5,
+                wordBreak:'break-word', whiteSpace:'pre-wrap', maxWidth:'100%',
+              }}>
+                {updateMsg}
+                <div style={{marginTop:8}}>
+                  <button className="btn" style={{height:26,fontSize:11,padding:'0 10px'}}
+                    onClick={() => window.api.openUpdateLog()}>
+                    {uk?'📄 Відкрити повний лог':'📄 Open full log'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Section>
     </div>
