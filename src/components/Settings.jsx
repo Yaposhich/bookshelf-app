@@ -5,7 +5,7 @@ const T = {
   uk: {
     settings:'Налаштування', language:'Мова інтерфейсу',
     languageDesc:'Оберіть мову відображення застосунку',
-    appearance:'Вигляд', theme:'Тема', themeDark:'Темна',
+    appearance:'Вигляд', theme:'Темна',
     themeNote:'Більше тем буде додано пізніше',
     about:'Про застосунок', version:'Версія',
     builtWith:'Зроблено з ❤️ за допомогою Electron + React + SQLite',
@@ -26,7 +26,7 @@ const T = {
   en: {
     settings:'Settings', language:'Interface Language',
     languageDesc:'Choose the display language of the app',
-    appearance:'Appearance', theme:'Theme', themeDark:'Dark',
+    appearance:'Appearance', theme:'Dark',
     themeNote:'More themes coming soon',
     about:'About', version:'Version',
     builtWith:'Made with ❤️ using Electron + React + SQLite',
@@ -47,7 +47,7 @@ const T = {
   ru: {
     settings:'Настройки', language:'Язык интерфейса',
     languageDesc:'Выберите язык отображения приложения',
-    appearance:'Внешний вид', theme:'Тема', themeDark:'Тёмная',
+    appearance:'Внешний вид', theme:'Тёмная',
     themeNote:'Больше тем появится позже',
     about:'О приложении', version:'Версия',
     builtWith:'Сделано с ❤️ на Electron + React + SQLite',
@@ -68,7 +68,7 @@ const T = {
   sv: {
     settings:'Inställningar', language:'Gränssnittsspråk',
     languageDesc:'Välj appens visningsspråk',
-    appearance:'Utseende', theme:'Tema', themeDark:'Mörkt',
+    appearance:'Utseende', theme:'Mörkt',
     themeNote:'Fler teman kommer snart',
     about:'Om appen', version:'Version',
     builtWith:'Gjord med ❤️ med Electron + React + SQLite',
@@ -89,7 +89,7 @@ const T = {
   de: {
     settings:'Einstellungen', language:'Oberflächensprache',
     languageDesc:'Anzeigesprache der App auswählen',
-    appearance:'Erscheinungsbild', theme:'Thema', themeDark:'Dunkel',
+    appearance:'Erscheinungsbild', theme:'Dunkel',
     themeNote:'Weitere Themen folgen bald',
     about:'Über die App', version:'Version',
     builtWith:'Mit ❤️ erstellt mit Electron + React + SQLite',
@@ -110,7 +110,7 @@ const T = {
   es: {
     settings:'Configuración', language:'Idioma de la interfaz',
     languageDesc:'Elige el idioma de visualización de la aplicación',
-    appearance:'Apariencia', theme:'Tema', themeDark:'Oscuro',
+    appearance:'Apariencia', theme:'Oscuro',
     themeNote:'Más temas próximamente',
     about:'Acerca de', version:'Versión',
     builtWith:'Hecho con ❤️ usando Electron + React + SQLite',
