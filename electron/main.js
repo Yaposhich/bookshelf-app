@@ -705,6 +705,8 @@ function setupAutoUpdater() {
   setInterval(() => autoUpdater.checkForUpdates().catch(() => {}), 4 * 60 * 60 * 1000)
 }
 
+ipcMain.handle('app:getVersion', () => app.getVersion())
+
 ipcMain.handle('updater:downloadNow', () => {
   autoUpdater.downloadUpdate().catch(() => {})
   return { ok: true }

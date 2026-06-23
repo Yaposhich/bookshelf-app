@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import track from '../useTrack'
 
 const T = {
@@ -178,6 +178,11 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
   const [importMsg, setImportMsg]       = useState('')
   const [analyticsStatus, setAnalyticsStatus] = useState(null)
   const [updateMsg, setUpdateMsg]       = useState('')
+  const [appVersion, setAppVersion]     = useState('')
+
+  useEffect(() => {
+    window.api.getAppVersion().then(v => setAppVersion(v)).catch(() => {})
+  }, [])
 
   const t = T[TRANSLATED.has(lang) ? lang : 'en']
   const current = LANG_OPTIONS.find(o => o.value === lang)
@@ -358,7 +363,7 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
       <Section title={t.about}>
         <div style={{fontSize:13,color:'var(--text2)',display:'flex',flexDirection:'column',gap:6}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{color:'var(--text3)'}}>{t.version}</span><span>1.0.1</span>
+            <span style={{color:'var(--text3)'}}>{t.version}</span><span>{appVersion}</span>
           </div>
           <div style={{marginTop:4,color:'var(--text3)',fontSize:12}}>{t.builtWith}</div>
           <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
