@@ -670,6 +670,10 @@ function setupAutoUpdater() {
   if (!app.isPackaged) return // skip in dev mode
 
   autoUpdater.autoDownload = false
+  autoUpdater.channel = 'latest'
+  if (process.platform === 'darwin') {
+  	autoUpdater.updateConfigPath = null
+  }
   autoUpdater.autoInstallOnAppQuit = false
 
   const send = (channel, data) => {
@@ -708,7 +712,8 @@ ipcMain.handle('updater:downloadNow', () => {
 
 ipcMain.handle('updater:installNow', () => {
   try {
-    autoUpdater.quitAndInstall(true, true)
+    autoUpdater.quitAndInstall(false, true);
+    setTimeout(() => { app.relaunch(); app.exit(0); }, 3000)
   } catch(e) {
     // fallback: relaunch manually
     app.relaunch()
