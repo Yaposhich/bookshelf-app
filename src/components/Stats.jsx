@@ -40,7 +40,7 @@ export default function Stats({ lang }) {
         <StatCard num={stats.total}   label={t.total}     color="purple" />
         <StatCard num={stats.read}    label={t.read}      color="green"  />
         <StatCard num={stats.reading} label={t.reading}   color="amber"  />
-        <StatCard num={stats.avg ? `${stats.avg}★` : '—'} label={t.avgRating} color="purple" />
+        <StatCard num={stats.avg ? `${stats.avg}/10` : '—'} label={t.avgRating} color="purple" />
       </div>
 
       {/* ── Period table: books + pages ── */}

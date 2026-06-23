@@ -36,7 +36,59 @@ const T = {
     empty:'Nothing here yet', emptyHint:'Add your first book!',
     noResults:'Nothing found', noResultsHint:'gave no results',
     deleteConfirm:'Delete this book?',
-  }
+  },
+  ru: {
+    allBooks:'Все книги', read:'Прочитанные', reading:'Читаю сейчас', readLater:'Читать позже',
+    library:'Библиотека', analytics:'Аналитика', statistics:'Статистика',
+    experimental:'Эксперимент', quotes:'Цитаты', settings:'Настройки',
+    addBook:'+ Добавить книгу', searchPlaceholder:'Поиск книги, автора...',
+    shelves:'Полки',
+    sortByDate:'По дате добавления', sortByRating:'По оценке', sortByTitle:'По названию (А-Я)', sortByAuthor:'По автору',
+    sortByYear:'По году написания',
+    totalBooks:'Всего книг', readCount:'Прочитано', readingNow:'Читаю сейчас',
+    empty:'Здесь пока ничего нет', emptyHint:'Добавь свою первую книгу!',
+    noResults:'Ничего не найдено', noResultsHint:'не дал результатов',
+    deleteConfirm:'Удалить эту книгу?',
+  },
+  sv: {
+    allBooks:'Alla böcker', read:'Lästa', reading:'Läser nu', readLater:'Läs senare',
+    library:'Bibliotek', analytics:'Analys', statistics:'Statistik',
+    experimental:'Experimentellt', quotes:'Citat', settings:'Inställningar',
+    addBook:'+ Lägg till bok', searchPlaceholder:'Sök bok, författare...',
+    shelves:'Hyllor',
+    sortByDate:'Efter tillagd datum', sortByRating:'Efter betyg', sortByTitle:'Efter titel (A-Ö)', sortByAuthor:'Efter författare',
+    sortByYear:'Efter skrivår',
+    totalBooks:'Totalt böcker', readCount:'Lästa', readingNow:'Läser nu',
+    empty:'Inget här ännu', emptyHint:'Lägg till din första bok!',
+    noResults:'Inget hittades', noResultsHint:'gav inga resultat',
+    deleteConfirm:'Ta bort den här boken?',
+  },
+  de: {
+    allBooks:'Alle Bücher', read:'Gelesen', reading:'Lese gerade', readLater:'Später lesen',
+    library:'Bibliothek', analytics:'Analytik', statistics:'Statistik',
+    experimental:'Experimentell', quotes:'Zitate', settings:'Einstellungen',
+    addBook:'+ Buch hinzufügen', searchPlaceholder:'Buch, Autor suchen...',
+    shelves:'Regale',
+    sortByDate:'Nach Hinzufügedatum', sortByRating:'Nach Bewertung', sortByTitle:'Nach Titel (A-Z)', sortByAuthor:'Nach Autor',
+    sortByYear:'Nach Erscheinungsjahr',
+    totalBooks:'Bücher gesamt', readCount:'Gelesen', readingNow:'Lese gerade',
+    empty:'Noch nichts hier', emptyHint:'Füge dein erstes Buch hinzu!',
+    noResults:'Nichts gefunden', noResultsHint:'ergab keine Ergebnisse',
+    deleteConfirm:'Dieses Buch löschen?',
+  },
+  es: {
+    allBooks:'Todos los libros', read:'Leídos', reading:'Leyendo ahora', readLater:'Leer después',
+    library:'Biblioteca', analytics:'Analítica', statistics:'Estadísticas',
+    experimental:'Experimental', quotes:'Citas', settings:'Configuración',
+    addBook:'+ Añadir libro', searchPlaceholder:'Buscar libro, autor...',
+    shelves:'Estantes',
+    sortByDate:'Por fecha añadida', sortByRating:'Por puntuación', sortByTitle:'Por título (A-Z)', sortByAuthor:'Por autor',
+    sortByYear:'Por año escrito',
+    totalBooks:'Total de libros', readCount:'Leídos', readingNow:'Leyendo ahora',
+    empty:'Aún nada aquí', emptyHint:'¡Añade tu primer libro!',
+    noResults:'Nada encontrado', noResultsHint:'no dio resultados',
+    deleteConfirm:'¿Eliminar este libro?',
+  },
 }
 
 export default function App() {
@@ -234,8 +286,22 @@ function ViewModal({ book, lang, onEdit, onDelete, onClose, onProgressUpdate }) 
   const STATUS_LABELS = {
     uk: { read:'✅ Прочитав', reading:'📖 Читаю', later:'🔖 Read Later' },
     en: { read:'✅ Read',     reading:'📖 Reading', later:'🔖 Read Later' },
+    ru: { read:'✅ Прочитал', reading:'📖 Читаю',  later:'🔖 Читать позже' },
+    sv: { read:'✅ Läst',     reading:'📖 Läser',  later:'🔖 Läs senare' },
+    de: { read:'✅ Gelesen',  reading:'📖 Lese',   later:'🔖 Später lesen' },
+    es: { read:'✅ Leído',    reading:'📖 Leyendo', later:'🔖 Leer después' },
   }
-  const sl = STATUS_LABELS[lang] || STATUS_LABELS.uk
+  const sl = STATUS_LABELS[lang] || STATUS_LABELS.en
+
+  const VM = {
+    uk: { details:'Деталі книги', progress:'Прогрес читання', pages:'сторінок', page:'стор.', save:'Зберегти', language:'Мова', year:'Рік', pgLabel:'Сторінок', quotes:'Цитати з цієї книги', delete:'Видалити', close:'Закрити', edit:'Редагувати' },
+    en: { details:'Book Details', progress:'Reading progress', pages:'pages', page:'p.', save:'Save', language:'Language', year:'Year', pgLabel:'Pages', quotes:'Quotes from this book', delete:'Delete', close:'Close', edit:'Edit' },
+    ru: { details:'Детали книги', progress:'Прогресс чтения', pages:'страниц', page:'стр.', save:'Сохранить', language:'Язык', year:'Год', pgLabel:'Страниц', quotes:'Цитаты из этой книги', delete:'Удалить', close:'Закрыть', edit:'Редактировать' },
+    sv: { details:'Bokdetaljer', progress:'Läsframsteg', pages:'sidor', page:'s.', save:'Spara', language:'Språk', year:'År', pgLabel:'Sidor', quotes:'Citat från denna bok', delete:'Ta bort', close:'Stäng', edit:'Redigera' },
+    de: { details:'Buchdetails', progress:'Lesefortschritt', pages:'Seiten', page:'S.', save:'Speichern', language:'Sprache', year:'Jahr', pgLabel:'Seiten', quotes:'Zitate aus diesem Buch', delete:'Löschen', close:'Schließen', edit:'Bearbeiten' },
+    es: { details:'Detalles del libro', progress:'Progreso de lectura', pages:'páginas', page:'p.', save:'Guardar', language:'Idioma', year:'Año', pgLabel:'Páginas', quotes:'Citas de este libro', delete:'Eliminar', close:'Cerrar', edit:'Editar' },
+  }
+  const vm = VM[lang] || VM.en
 
   const tags     = book.tags ? book.tags.split(',').map(t => t.trim()).filter(Boolean) : []
   const coverSrc = book.cover_local ? `file://${book.cover_local}` : book.cover_url
@@ -246,7 +312,7 @@ function ViewModal({ book, lang, onEdit, onDelete, onClose, onProgressUpdate }) 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{lang === 'en' ? 'Book Details' : 'Деталі книги'}</h2>
+          <h2>{vm.details}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -276,7 +342,7 @@ function ViewModal({ book, lang, onEdit, onDelete, onClose, onProgressUpdate }) 
         {book.status === 'reading' && book.total_pages > 0 && (
           <div style={{background:'var(--bg3)',borderRadius:'var(--radius)',padding:'12px 14px',marginBottom:14}}>
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:13}}>
-              <span style={{color:'var(--text2)'}}>{lang==='en'?'Reading progress':'Прогрес читання'}</span>
+              <span style={{color:'var(--text2)'}}>{vm.progress}</span>
               <span style={{color:'var(--amber)',fontWeight:600}}>{pct}%</span>
             </div>
             <div style={{height:6,background:'var(--bg4)',borderRadius:3,overflow:'hidden',marginBottom:10}}>
@@ -286,19 +352,19 @@ function ViewModal({ book, lang, onEdit, onDelete, onClose, onProgressUpdate }) 
               <input type="number" value={pageInput} onChange={e=>setPageInput(parseInt(e.target.value)||0)}
                 min={0} max={book.total_pages}
                 style={{width:80,background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:6,color:'var(--text)',fontSize:13,padding:'5px 8px',fontFamily:'inherit',outline:'none'}} />
-              <span style={{fontSize:13,color:'var(--text3)'}}> / {book.total_pages} {lang==='en'?'pages':'сторінок'}</span>
+              <span style={{fontSize:13,color:'var(--text3)'}}> / {book.total_pages} {vm.pages}</span>
               <button className="btn btn-primary" style={{marginLeft:'auto',height:30,padding:'0 12px',fontSize:12}}
                 onClick={() => onProgressUpdate(book.id, pageInput)}>
-                {lang==='en'?'Save':'Зберегти'}
+                {vm.save}
               </button>
             </div>
           </div>
         )}
 
         <div className="view-meta-grid">
-          {book.language  && <div className="view-meta-item"><div className="view-meta-label">{lang==='en'?'Language':'Мова'}</div><div className="view-meta-value">{book.language}</div></div>}
-          {book.year_read && <div className="view-meta-item"><div className="view-meta-label">{lang==='en'?'Year':'Рік'}</div><div className="view-meta-value">{book.year_read}</div></div>}
-          {book.total_pages > 0 && <div className="view-meta-item"><div className="view-meta-label">{lang==='en'?'Pages':'Сторінок'}</div><div className="view-meta-value">{book.total_pages}</div></div>}
+          {book.language  && <div className="view-meta-item"><div className="view-meta-label">{vm.language}</div><div className="view-meta-value">{book.language}</div></div>}
+          {book.year_read && <div className="view-meta-item"><div className="view-meta-label">{vm.year}</div><div className="view-meta-value">{book.year_read}</div></div>}
+          {book.total_pages > 0 && <div className="view-meta-item"><div className="view-meta-label">{vm.pgLabel}</div><div className="view-meta-value">{book.total_pages}</div></div>}
         </div>
 
         {tags.length > 0 && (
@@ -313,14 +379,14 @@ function ViewModal({ book, lang, onEdit, onDelete, onClose, onProgressUpdate }) 
           <div style={{marginTop:14}}>
             <button onClick={() => setShowQuotes(v => !v)}
               style={{background:'none',border:'none',cursor:'pointer',color:'var(--purple)',fontSize:13,fontFamily:'inherit',fontWeight:500,padding:0}}>
-              💬 {lang==='en'?'Quotes from this book':'Цитати з цієї книги'} ({quotes.length}) {showQuotes?'▲':'▼'}
+              💬 {vm.quotes} ({quotes.length}) {showQuotes?'▲':'▼'}
             </button>
             {showQuotes && (
               <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
                 {quotes.map(q => (
                   <div key={q.id} style={{background:'var(--bg3)',borderLeft:'3px solid var(--purple)',borderRadius:'0 var(--radius) var(--radius) 0',padding:'10px 12px'}}>
                     <div style={{fontSize:13,color:'var(--text)',fontStyle:'italic',lineHeight:1.6,marginBottom:4}}>"{q.text}"</div>
-                    {(q.page||q.note) && <div style={{fontSize:11,color:'var(--text3)'}}>{q.page?`${lang==='en'?'p.':'стор.'} ${q.page}`:''}{q.page&&q.note?' · ':''}{q.note}</div>}
+                    {(q.page||q.note) && <div style={{fontSize:11,color:'var(--text3)'}}>{q.page?`${vm.page} ${q.page}`:''}{q.page&&q.note?' · ':''}{q.note}</div>}
                   </div>
                 ))}
               </div>
@@ -329,10 +395,10 @@ function ViewModal({ book, lang, onEdit, onDelete, onClose, onProgressUpdate }) 
         )}
 
         <div className="modal-footer">
-          <button className="btn btn-danger" onClick={onDelete}>🗑️ {lang==='en'?'Delete':'Видалити'}</button>
+          <button className="btn btn-danger" onClick={onDelete}>🗑️ {vm.delete}</button>
           <div style={{flex:1}} />
-          <button className="btn" onClick={onClose}>{lang==='en'?'Close':'Закрити'}</button>
-          <button className="btn btn-primary" onClick={onEdit}>✏️ {lang==='en'?'Edit':'Редагувати'}</button>
+          <button className="btn" onClick={onClose}>{vm.close}</button>
+          <button className="btn btn-primary" onClick={onEdit}>✏️ {vm.edit}</button>
         </div>
       </div>
     </div>

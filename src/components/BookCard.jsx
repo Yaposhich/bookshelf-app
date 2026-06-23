@@ -31,11 +31,15 @@ export default function BookCard({ book, onClick, onEdit, onDelete }) {
         </div>
 
         {book.status==='read' && book.rating>0 && (
-          <div className="book-stars">
-            {[1,2,3,4,5].map(i=>(
-              <span key={i} className={`star ${i<=book.rating?'':'empty'}`}>★</span>
-            ))}
-            {book.year_read && <span style={{marginLeft:6,fontSize:11,color:'var(--text3)'}}>{book.year_read}</span>}
+          <div style={{display:'flex',alignItems:'center',gap:6,marginTop:2}}>
+            <span style={{
+              display:'inline-flex',alignItems:'center',gap:3,
+              fontSize:11,fontWeight:600,color:'var(--amber)',
+              background:'var(--amber-bg)',padding:'2px 7px',borderRadius:6,
+            }}>
+              ★ {book.rating}/10
+            </span>
+            {book.year_read && <span style={{fontSize:11,color:'var(--text3)'}}>{book.year_read}</span>}
           </div>
         )}
 

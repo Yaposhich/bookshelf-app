@@ -178,6 +178,7 @@ export default function BookModal({ book, onSave, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:580}} onClick={e=>e.stopPropagation()}>
+        <div className="modal-scroll">
         <div className="modal-header">
           <h2>{book ? 'Редагувати книгу' : 'Додати книгу'}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
@@ -380,11 +381,11 @@ export default function BookModal({ book, onSave, onClose }) {
             {form.status==='read' && (<>
               <div className="form-group">
                 <label>Оцінка</label>
-                <div className="star-picker">
-                  {[1,2,3,4,5].map(n=>(
-                    <button key={n} className={`star-pick ${n<=form.rating?'active':''}`} onClick={()=>set('rating',form.rating===n?0:n)}>★</button>
+                <div className="rating-picker">
+                  {Array.from({length:10},(_,i)=>i+1).map(n=>(
+                    <button key={n} className={`rating-pick ${n<=form.rating?'active':''}`} onClick={()=>set('rating',form.rating===n?0:n)}>{n}</button>
                   ))}
-                  {form.rating>0&&<span style={{fontSize:12,color:'var(--text3)',alignSelf:'center',marginLeft:8}}>{form.rating}/5</span>}
+                  {form.rating>0&&<span style={{fontSize:13,fontWeight:600,color:'var(--purple)',alignSelf:'center',marginLeft:6}}>{form.rating}/10</span>}
                 </div>
               </div>
               <div className="form-group">
@@ -412,6 +413,7 @@ export default function BookModal({ book, onSave, onClose }) {
             </div>
           </>
         )}
+        </div>{/* modal-scroll */}
       </div>
     </div>
   )

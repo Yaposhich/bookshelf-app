@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-app",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Особиста бібліотека книг",
   "main": "electron/main.js",
   "scripts": {
@@ -8,12 +8,17 @@
     "build": "vite build",
     "electron:dev": "electron .",
     "start": "concurrently \"vite\" \"electron .\"",
+    "postinstall": "electron-builder install-app-deps",
     "dist": "vite build && electron-builder",
     "release": "vite build && electron-builder --publish always"
   },
   "build": {
     "appId": "com.bookshelf.app",
     "productName": "Bookshelf",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
+    ],
     "publish": {
       "provider": "github",
       "owner": "Yaposhich",
@@ -21,7 +26,14 @@
     },
     "mac": {
       "category": "public.app-category.productivity",
-      "target": ["dmg", "zip"]
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "hardenedRuntime": false
+    },
+    "dmg": {
+      "writeUpdateInfo": false
     },
     "directories": {
       "output": "dist-electron"
@@ -29,8 +41,13 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "node_modules/better-sqlite3/**/*"
-    ]
+      "node_modules/better-sqlite3/build/Release/**/*",
+      "node_modules/better-sqlite3/lib/**/*",
+      "node_modules/better-sqlite3/package.json",
+      "node_modules/bindings/**/*",
+      "node_modules/file-uri-to-path/**/*"
+    ],
+    "npmRebuild": true
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",

@@ -669,8 +669,8 @@ function createWindow() {
 function setupAutoUpdater() {
   if (!app.isPackaged) return // skip in dev mode
 
-  autoUpdater.autoDownload = true
-  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = false
 
   const send = (channel, data) => {
     if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send(channel, data)
@@ -701,8 +701,20 @@ function setupAutoUpdater() {
   setInterval(() => autoUpdater.checkForUpdates().catch(() => {}), 4 * 60 * 60 * 1000)
 }
 
+ipcMain.handle('updater:downloadNow', () => {
+  autoUpdater.downloadUpdate().catch(() => {})
+  return { ok: true }
+})
+
 ipcMain.handle('updater:installNow', () => {
-  autoUpdater.quitAndInstall()
+  try {
+    autoUpdater.quitAndInstall(true, true)
+  } catch(e) {
+    // fallback: relaunch manually
+    app.relaunch()
+    app.exit(0)
+  }
+  return { ok: true }
 })
 
 ipcMain.handle('updater:checkNow', async () => {

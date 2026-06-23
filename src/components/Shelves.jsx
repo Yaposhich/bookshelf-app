@@ -180,9 +180,9 @@ export default function Shelves({ lang, allBooks }) {
                         <div style={{ fontSize:14, fontWeight:500, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{book.title}</div>
                         <div style={{ fontSize:12, color:'var(--text3)' }}>{book.author||'—'}{book.year_read?` · ${book.year_read}`:''}</div>
                         {book.rating>0 && (
-                          <div style={{ display:'flex', gap:1, marginTop:3 }}>
-                            {[1,2,3,4,5].map(i=><span key={i} style={{ fontSize:10, color:i<=book.rating?'#fbbf24':'var(--bg4)' }}>★</span>)}
-                          </div>
+                          <span style={{ fontSize:10, fontWeight:600, color:'#fbbf24', marginTop:3, display:'inline-block' }}>
+                            ★ {book.rating}/10
+                          </span>
                         )}
                       </div>
                       <div style={{ display:'flex', gap:4, alignItems:'center' }}>
