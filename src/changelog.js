@@ -2,21 +2,29 @@
 // Shown in Settings → About → "What's new", and as a popup right after an update installs.
 export const CHANGELOG = [
   {
+    version: '1.5.1',
+    date: '2026-07-26',
+    uk: [
+      'Оновлений дизайн десятибальної оцінки — заповнення кольором за оцінкою (червоний→бурштиновий→зелений)',
+      'Виправлено скролбар у вікні додавання книги (більше не вилазить за край)',
+    ],
+    en: [
+      'Redesigned the 10-point rating — fills with a score-based color (red→amber→green)',
+      'Fixed the scrollbar in the Add Book window (no longer overflows the edge)',
+    ],
+  },
+  {
     version: '1.5.0',
     date: '2026-07-26',
     uk: [
       'Повний переклад інтерфейсу на 22 мови (uk, en, de, fr, es, it, pt, pl, nl, sv, no, da, fi, cs, ro, hu, el, tr, ru + арабська, іврит, фарсі)',
       'Підтримка мов із письмом справа наліво (RTL)',
       'Виправлено пошук книг: якщо Google Books недоступний, автоматично шукає через Open Library',
-      'Виправлено скролбар у вікні додавання книги (більше не вилазить за край)',
-      'Оновлений дизайн десятибальної оцінки — заповнення кольором за оцінкою (червоний→бурштиновий→зелений)',
     ],
     en: [
       'Full UI translation into 22 languages (uk, en, de, fr, es, it, pt, pl, nl, sv, no, da, fi, cs, ro, hu, el, tr, ru + Arabic, Hebrew, Persian)',
       'Right-to-left (RTL) layout support',
       'Fixed book search: falls back to Open Library automatically when Google Books is unavailable',
-      'Fixed the scrollbar in the Add Book window (no longer overflows the edge)',
-      'Redesigned the 10-point rating — fills with a score-based color (red→amber→green)',
     ],
   },
   {
