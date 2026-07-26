@@ -1,13 +1,16 @@
 import { CHANGELOG } from '../changelog'
+import { getT } from '../i18n'
 
 export default function ChangelogModal({ lang, onClose, highlightVersion }) {
-  const uk = lang !== 'en'
+  const t = getT(lang)
+  // Changelog copy only exists in uk/en — show Ukrainian for uk, English otherwise.
+  const useUk = lang === 'uk'
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:480}} onClick={e=>e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{uk ? 'Що нового' : "What's new"}</h2>
+          <h2>{t.whatsNew}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -28,12 +31,12 @@ export default function ChangelogModal({ lang, onClose, highlightVersion }) {
                   <span style={{fontSize:11,color:'var(--text3)'}}>{entry.date}</span>
                   {isHighlighted && (
                     <span style={{fontSize:10,background:'var(--purple)',color:'#fff',padding:'1px 7px',borderRadius:20,fontWeight:600,marginLeft:'auto'}}>
-                      {uk?'Поточна':'Current'}
+                      {t.changelogCurrent}
                     </span>
                   )}
                 </div>
                 <ul style={{margin:0,paddingLeft:18,display:'flex',flexDirection:'column',gap:5}}>
-                  {(uk ? entry.uk : entry.en).map((line, i) => (
+                  {(useUk ? entry.uk : entry.en).map((line, i) => (
                     <li key={i} style={{fontSize:13,color:'var(--text2)',lineHeight:1.5}}>{line}</li>
                   ))}
                 </ul>
@@ -43,7 +46,7 @@ export default function ChangelogModal({ lang, onClose, highlightVersion }) {
         </div>
 
         <div className="modal-footer">
-          <button className="btn btn-primary" onClick={onClose}>{uk?'Зрозуміло':'Got it'}</button>
+          <button className="btn btn-primary" onClick={onClose}>{t.gotIt}</button>
         </div>
       </div>
     </div>

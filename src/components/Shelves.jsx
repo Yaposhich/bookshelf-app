@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getT, fmt } from '../i18n'
 
 const ICONS  = ['📁','📚','⭐','❤️','🔥','🎯','💡','🏆','🌟','🎨','🔬','🌍','⚔️','🚀','🧠','🎭','🌿','💼','🔮','🎵']
 const COLORS = ['#8b7cf8','#4ade80','#fbbf24','#f87171','#60a5fa','#f472b6','#34d399','#fb923c','#a78bfa','#2dd4bf']
@@ -17,7 +18,7 @@ export default function Shelves({ lang, allBooks }) {
 
   const setAddBooks = (val) => { setAddBooksRaw(val); if (!val) setBookSearch('') }
 
-  const uk = lang !== 'en'
+  const t = getT(lang)
 
   const load = async () => {
     const s = await window.api.getShelves()
@@ -89,7 +90,7 @@ export default function Shelves({ lang, allBooks }) {
       <div style={{ width:220, borderRight:'1px solid var(--border)', background:'var(--bg2)', display:'flex', flexDirection:'column', flexShrink:0, overflow:'hidden' }}>
         <div style={{ padding:'14px 14px 10px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <span style={{ fontSize:12, fontWeight:600, color:'var(--text3)', textTransform:'uppercase', letterSpacing:'0.06em' }}>
-            {uk?'Мої полиці':'My Shelves'}
+            {t.myShelves}
           </span>
           <button onClick={openAdd} style={{ width:24, height:24, borderRadius:6, border:'1px solid var(--border)', background:'var(--bg3)', color:'var(--text2)', cursor:'pointer', fontSize:14, display:'flex', alignItems:'center', justifyContent:'center' }}>+</button>
         </div>
@@ -97,7 +98,7 @@ export default function Shelves({ lang, allBooks }) {
         <div style={{ flex:1, overflowY:'auto', padding:'8px 8px' }}>
           {shelves.length === 0 ? (
             <div style={{ padding:'20px 8px', textAlign:'center', color:'var(--text3)', fontSize:12, lineHeight:1.6 }}>
-              {uk?'Ще немає полиць.\nНатисни + щоб створити':'No shelves yet.\nClick + to create one'}
+              {t.noShelvesYet}
             </div>
           ) : shelves.map(s => (
             <div key={s.id}
@@ -132,8 +133,8 @@ export default function Shelves({ lang, allBooks }) {
         {!activeShelf ? (
           <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', color:'var(--text3)', gap:12 }}>
             <span style={{ fontSize:48 }}>📁</span>
-            <div style={{ fontSize:15, color:'var(--text2)', fontWeight:500 }}>{uk?'Обери полицю':'Select a shelf'}</div>
-            <div style={{ fontSize:13 }}>{uk?'або створи нову натиснувши +':'or create a new one with +'}</div>
+            <div style={{ fontSize:15, color:'var(--text2)', fontWeight:500 }}>{t.selectShelf}</div>
+            <div style={{ fontSize:13 }}>{t.selectShelfHint}</div>
           </div>
         ) : (
           <>
@@ -142,19 +143,19 @@ export default function Shelves({ lang, allBooks }) {
               <span style={{ fontSize:22 }}>{activeShelf.icon}</span>
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:16, fontWeight:600 }}>{activeShelf.name}</div>
-                <div style={{ fontSize:12, color:'var(--text3)' }}>{shelfBooks.length} {uk?'книг':'books'}</div>
+                <div style={{ fontSize:12, color:'var(--text3)' }}>{fmt(t.shelfBooksCount, { n: shelfBooks.length })}</div>
               </div>
               {/* Sort */}
               <select value={sort} onChange={e=>setSort(e.target.value)}
                 style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'var(--radius)', color:'var(--text2)', fontSize:12, padding:'5px 10px', fontFamily:'inherit', outline:'none' }}>
-                <option value="added">{uk?'За датою додавання':'By date added'}</option>
-                <option value="title">{uk?'За назвою А-Я':'By title A-Z'}</option>
-                <option value="author">{uk?'За автором':'By author'}</option>
-                <option value="rating">{uk?'За оцінкою':'By rating'}</option>
-                <option value="year">{uk?'За роком написання':'By year'}</option>
+                <option value="added">{t.shelfSortAdded}</option>
+                <option value="title">{t.shelfSortTitle}</option>
+                <option value="author">{t.shelfSortAuthor}</option>
+                <option value="rating">{t.shelfSortRating}</option>
+                <option value="year">{t.shelfSortYear}</option>
               </select>
               <button className="btn-add" onClick={() => setAddBooks(true)}>
-                {uk?'+ Додати книгу':'+ Add book'}
+                {t.addBookToShelfBtn}
               </button>
             </div>
 
@@ -163,8 +164,8 @@ export default function Shelves({ lang, allBooks }) {
               {sortedBooks.length === 0 ? (
                 <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--text3)', gap:10, paddingTop:60 }}>
                   <span style={{ fontSize:40 }}>📚</span>
-                  <div style={{ fontSize:14, color:'var(--text2)' }}>{uk?'Полиця порожня':'Shelf is empty'}</div>
-                  <div style={{ fontSize:12 }}>{uk?'Натисни "+ Додати книгу" щоб наповнити':'Click "+ Add book" to fill it'}</div>
+                  <div style={{ fontSize:14, color:'var(--text2)' }}>{t.shelfEmpty}</div>
+                  <div style={{ fontSize:12 }}>{t.shelfEmptyHint}</div>
                 </div>
               ) : (
                 <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
@@ -212,19 +213,19 @@ export default function Shelves({ lang, allBooks }) {
         <div className="modal-overlay" onClick={() => setModal(false)}>
           <div className="modal" style={{ maxWidth:400 }} onClick={e=>e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editShelf ? (uk?'Редагувати полицю':'Edit Shelf') : (uk?'Нова полиця':'New Shelf')}</h2>
+              <h2>{editShelf ? t.editShelfTitle : t.newShelfTitle}</h2>
               <button className="modal-close" onClick={() => setModal(false)}>✕</button>
             </div>
 
             <div className="form-group">
-              <label>{uk?'Назва':'Name'}</label>
+              <label>{t.labelName}</label>
               <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}
-                placeholder={uk?'Назва полиці...':'Shelf name...'} autoFocus
+                placeholder={t.placeholderShelfName} autoFocus
                 style={{ width:'100%', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--radius)', color:'var(--text)', fontSize:14, padding:'9px 12px', fontFamily:'inherit', outline:'none' }} />
             </div>
 
             <div className="form-group">
-              <label>{uk?'Іконка':'Icon'}</label>
+              <label>{t.labelIcon}</label>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(10,1fr)', gap:4, background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--radius)', padding:8 }}>
                 {ICONS.map(ic => (
                   <div key={ic} onClick={() => setForm(f=>({...f,icon:ic}))}
@@ -236,7 +237,7 @@ export default function Shelves({ lang, allBooks }) {
             </div>
 
             <div className="form-group">
-              <label>{uk?'Колір':'Color'}</label>
+              <label>{t.labelColor}</label>
               <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
                 {COLORS.map(c => (
                   <div key={c} onClick={() => setForm(f=>({...f,color:c}))}
@@ -246,8 +247,8 @@ export default function Shelves({ lang, allBooks }) {
             </div>
 
             <div className="modal-footer">
-              <button className="btn" onClick={() => setModal(false)}>{uk?'Скасувати':'Cancel'}</button>
-              <button className="btn btn-primary" onClick={handleSave}>{editShelf?(uk?'Зберегти':'Save'):(uk?'Створити':'Create')}</button>
+              <button className="btn" onClick={() => setModal(false)}>{t.cancel}</button>
+              <button className="btn btn-primary" onClick={handleSave}>{editShelf?t.save:t.create}</button>
             </div>
           </div>
         </div>
@@ -272,7 +273,7 @@ export default function Shelves({ lang, allBooks }) {
           <div className="modal-overlay" onClick={() => setAddBooks(false)}>
             <div className="modal" style={{ maxWidth:480 }} onClick={e=>e.stopPropagation()}>
               <div className="modal-header">
-                <h2>{uk?`Додати в "${activeShelf?.name}"`:`Add to "${activeShelf?.name}"`}</h2>
+                <h2>{fmt(t.addToShelf, { name: activeShelf?.name })}</h2>
                 <button className="modal-close" onClick={() => setAddBooks(false)}>✕</button>
               </div>
 
@@ -283,7 +284,7 @@ export default function Shelves({ lang, allBooks }) {
                   autoFocus
                   value={bookSearch}
                   onChange={e => setBookSearch(e.target.value)}
-                  placeholder={uk?'Пошук за назвою або автором...':'Search by title or author...'}
+                  placeholder={t.searchByTitleAuthor}
                   style={{ width:'100%', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:'var(--radius)', color:'var(--text)', fontSize:13, padding:'8px 12px 8px 34px', fontFamily:'inherit', outline:'none' }}
                 />
                 {bookSearch && (
@@ -295,11 +296,11 @@ export default function Shelves({ lang, allBooks }) {
               <div style={{ maxHeight:360, overflowY:'auto', display:'flex', flexDirection:'column', gap:6 }}>
                 {availableBooks.length === 0 ? (
                   <div style={{ textAlign:'center', padding:30, color:'var(--text3)', fontSize:13 }}>
-                    {uk?'Всі книги вже на цій полиці':'All books are already on this shelf'}
+                    {t.allBooksOnShelf}
                   </div>
                 ) : displayBooks.length === 0 ? (
                   <div style={{ textAlign:'center', padding:30, color:'var(--text3)', fontSize:13 }}>
-                    {uk?`Нічого не знайдено за "${bookSearch}"`:`No results for "${bookSearch}"`}
+                    {fmt(t.noResultsForQuery, { query: bookSearch })}
                   </div>
                 ) : displayBooks.map(b => {
                   const q2 = bookSearch.toLowerCase()
@@ -324,7 +325,7 @@ export default function Shelves({ lang, allBooks }) {
                         <div style={{ fontSize:13, fontWeight:500, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{hl(b.title)}</div>
                         <div style={{ fontSize:11, color:'var(--text3)' }}>{hl(b.author||'—')}</div>
                       </div>
-                      <span style={{ fontSize:11, color:'var(--purple)', flexShrink:0 }}>{uk?'Додати →':'Add →'}</span>
+                      <span style={{ fontSize:11, color:'var(--purple)', flexShrink:0 }}>{t.addBookRowArrow}</span>
                     </div>
                   )
                 })}
@@ -339,17 +340,15 @@ export default function Shelves({ lang, allBooks }) {
         <div className="modal-overlay" onClick={() => setConfirmDel(null)}>
           <div className="modal" style={{ maxWidth:360 }} onClick={e=>e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{uk?'Видалити полицю?':'Delete shelf?'}</h2>
+              <h2>{t.deleteShelfConfirmTitle}</h2>
               <button className="modal-close" onClick={() => setConfirmDel(null)}>✕</button>
             </div>
             <p style={{ fontSize:14, color:'var(--text2)', marginBottom:20, lineHeight:1.6 }}>
-              {uk
-                ? `Полиця "${confirmDel.name}" буде видалена. Книги залишаться в бібліотеці.`
-                : `Shelf "${confirmDel.name}" will be deleted. Books will remain in the library.`}
+              {fmt(t.deleteShelfConfirmBody, { name: confirmDel.name })}
             </p>
             <div className="modal-footer">
-              <button className="btn" onClick={() => setConfirmDel(null)}>{uk?'Скасувати':'Cancel'}</button>
-              <button className="btn btn-danger" onClick={confirmDelete}>{uk?'Видалити':'Delete'}</button>
+              <button className="btn" onClick={() => setConfirmDel(null)}>{t.cancel}</button>
+              <button className="btn btn-danger" onClick={confirmDelete}>{t.delete}</button>
             </div>
           </div>
         </div>

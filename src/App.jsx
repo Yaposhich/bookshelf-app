@@ -8,88 +8,7 @@ import Quotes    from './components/Quotes'
 import Settings  from './components/Settings'
 import Shelves   from './components/Shelves'
 import UpdateBanner from './components/UpdateBanner'
-
-// ── Translations ───────────────────────────────────────────────────
-const T = {
-  uk: {
-    allBooks:'Всі книги', read:'Прочитані', reading:'Читаю зараз', readLater:'Read Later',
-    library:'Бібліотека', analytics:'Аналітика', statistics:'Статистика',
-    experimental:'Експеримент', quotes:'Цитати', settings:'Налаштування',
-    addBook:'+ Додати книгу', searchPlaceholder:'Пошук книги, автора...',
-    shelves:'Полиці',
-    sortByDate:'За датою додавання', sortByRating:'За оцінкою', sortByTitle:'За назвою (А-Я)', sortByAuthor:'За автором',
-    sortByYear:'За роком написання',
-    totalBooks:'Всього книг', readCount:'Прочитано', readingNow:'Читаю зараз',
-    empty:'Тут ще нічого нема', emptyHint:'Додай свою першу книгу!',
-    noResults:'Нічого не знайдено', noResultsHint:'не дав результатів',
-    deleteConfirm:'Видалити цю книгу?',
-  },
-  en: {
-    allBooks:'All Books', read:'Read', reading:'Reading', readLater:'Read Later',
-    library:'Library', analytics:'Analytics', statistics:'Statistics',
-    experimental:'Experimental', quotes:'Quotes', settings:'Settings',
-    addBook:'+ Add Book', searchPlaceholder:'Search book, author...',
-    shelves:'Shelves',
-    sortByDate:'By date added', sortByRating:'By rating', sortByTitle:'By title (A-Z)', sortByAuthor:'By author',
-    sortByYear:'By year written',
-    totalBooks:'Total Books', readCount:'Read', readingNow:'Reading Now',
-    empty:'Nothing here yet', emptyHint:'Add your first book!',
-    noResults:'Nothing found', noResultsHint:'gave no results',
-    deleteConfirm:'Delete this book?',
-  },
-  ru: {
-    allBooks:'Все книги', read:'Прочитанные', reading:'Читаю сейчас', readLater:'Читать позже',
-    library:'Библиотека', analytics:'Аналитика', statistics:'Статистика',
-    experimental:'Эксперимент', quotes:'Цитаты', settings:'Настройки',
-    addBook:'+ Добавить книгу', searchPlaceholder:'Поиск книги, автора...',
-    shelves:'Полки',
-    sortByDate:'По дате добавления', sortByRating:'По оценке', sortByTitle:'По названию (А-Я)', sortByAuthor:'По автору',
-    sortByYear:'По году написания',
-    totalBooks:'Всего книг', readCount:'Прочитано', readingNow:'Читаю сейчас',
-    empty:'Здесь пока ничего нет', emptyHint:'Добавь свою первую книгу!',
-    noResults:'Ничего не найдено', noResultsHint:'не дал результатов',
-    deleteConfirm:'Удалить эту книгу?',
-  },
-  sv: {
-    allBooks:'Alla böcker', read:'Lästa', reading:'Läser nu', readLater:'Läs senare',
-    library:'Bibliotek', analytics:'Analys', statistics:'Statistik',
-    experimental:'Experimentellt', quotes:'Citat', settings:'Inställningar',
-    addBook:'+ Lägg till bok', searchPlaceholder:'Sök bok, författare...',
-    shelves:'Hyllor',
-    sortByDate:'Efter tillagd datum', sortByRating:'Efter betyg', sortByTitle:'Efter titel (A-Ö)', sortByAuthor:'Efter författare',
-    sortByYear:'Efter skrivår',
-    totalBooks:'Totalt böcker', readCount:'Lästa', readingNow:'Läser nu',
-    empty:'Inget här ännu', emptyHint:'Lägg till din första bok!',
-    noResults:'Inget hittades', noResultsHint:'gav inga resultat',
-    deleteConfirm:'Ta bort den här boken?',
-  },
-  de: {
-    allBooks:'Alle Bücher', read:'Gelesen', reading:'Lese gerade', readLater:'Später lesen',
-    library:'Bibliothek', analytics:'Analytik', statistics:'Statistik',
-    experimental:'Experimentell', quotes:'Zitate', settings:'Einstellungen',
-    addBook:'+ Buch hinzufügen', searchPlaceholder:'Buch, Autor suchen...',
-    shelves:'Regale',
-    sortByDate:'Nach Hinzufügedatum', sortByRating:'Nach Bewertung', sortByTitle:'Nach Titel (A-Z)', sortByAuthor:'Nach Autor',
-    sortByYear:'Nach Erscheinungsjahr',
-    totalBooks:'Bücher gesamt', readCount:'Gelesen', readingNow:'Lese gerade',
-    empty:'Noch nichts hier', emptyHint:'Füge dein erstes Buch hinzu!',
-    noResults:'Nichts gefunden', noResultsHint:'ergab keine Ergebnisse',
-    deleteConfirm:'Dieses Buch löschen?',
-  },
-  es: {
-    allBooks:'Todos los libros', read:'Leídos', reading:'Leyendo ahora', readLater:'Leer después',
-    library:'Biblioteca', analytics:'Analítica', statistics:'Estadísticas',
-    experimental:'Experimental', quotes:'Citas', settings:'Configuración',
-    addBook:'+ Añadir libro', searchPlaceholder:'Buscar libro, autor...',
-    shelves:'Estantes',
-    sortByDate:'Por fecha añadida', sortByRating:'Por puntuación', sortByTitle:'Por título (A-Z)', sortByAuthor:'Por autor',
-    sortByYear:'Por año escrito',
-    totalBooks:'Total de libros', readCount:'Leídos', readingNow:'Leyendo ahora',
-    empty:'Aún nada aquí', emptyHint:'¡Añade tu primer libro!',
-    noResults:'Nada encontrado', noResultsHint:'no dio resultados',
-    deleteConfirm:'¿Eliminar este libro?',
-  },
-}
+import { getT, fmt, RTL_LANGS } from './i18n'
 
 export default function App() {
   const [books, setBooks]       = useState([])
@@ -117,11 +36,16 @@ export default function App() {
     }
   }, [theme])
 
-  const t = T[lang] || T.uk
+  const t = getT(lang)
+
+  // Right-to-left languages flip the whole layout.
+  useEffect(() => {
+    document.documentElement.dir = RTL_LANGS.has(lang) ? 'rtl' : 'ltr'
+  }, [lang])
 
   const STATUS_TITLES = {
     all: t.allBooks, read: t.read, reading: t.reading, later: t.readLater,
-    stats: t.statistics, quotes: t.quotes, settings: t.settings, shelves: t.shelves || 'Полиці',
+    stats: t.statistics, quotes: t.quotes, settings: t.settings, shelves: t.shelves,
   }
 
   useEffect(() => { track('app:launch') }, [])
@@ -240,10 +164,10 @@ export default function App() {
                   <div className="empty-state">
                     <div className="empty-state-icon">📚</div>
                     <h3>{search ? t.noResults : t.empty}</h3>
-                    <p>{search ? `"${search}" ${t.noResultsHint}` : t.emptyHint}</p>
+                    <p>{search ? fmt(t.noResultsFor, { query: search }) : t.emptyHint}</p>
                   </div>
                 ) : sorted.map(book => (
-                  <BookCard key={book.id} book={book} onClick={setViewBook} onEdit={openEdit} onDelete={handleDelete} />
+                  <BookCard key={book.id} book={book} t={t} onClick={setViewBook} onEdit={openEdit} onDelete={handleDelete} />
                 ))}
               </div>
             </>
@@ -253,7 +177,7 @@ export default function App() {
 
       <UpdateBanner lang={lang} />
 
-      {modalOpen && <BookModal book={editBook} onSave={handleSave} onClose={closeModal} />}
+      {modalOpen && <BookModal book={editBook} lang={lang} onSave={handleSave} onClose={closeModal} />}
 
       {viewBook && (
         <ViewModal
@@ -283,25 +207,13 @@ function ViewModal({ book, lang, onEdit, onDelete, onClose, onProgressUpdate }) 
     window.api.getBookQuotes(book.id).then(setQuotes)
   }, [book.id])
 
-  const STATUS_LABELS = {
-    uk: { read:'✅ Прочитав', reading:'📖 Читаю', later:'🔖 Read Later' },
-    en: { read:'✅ Read',     reading:'📖 Reading', later:'🔖 Read Later' },
-    ru: { read:'✅ Прочитал', reading:'📖 Читаю',  later:'🔖 Читать позже' },
-    sv: { read:'✅ Läst',     reading:'📖 Läser',  later:'🔖 Läs senare' },
-    de: { read:'✅ Gelesen',  reading:'📖 Lese',   later:'🔖 Später lesen' },
-    es: { read:'✅ Leído',    reading:'📖 Leyendo', later:'🔖 Leer después' },
+  const t = getT(lang)
+  const sl = { read: t.statusRead, reading: t.statusReading, later: t.statusReadLater }
+  const vm = {
+    details: t.bookDetails, progress: t.readingProgress, pages: t.pages, page: t.pageAbbr,
+    save: t.save, language: t.language, year: t.year, pgLabel: t.pgLabel,
+    quotes: t.quotesFromBook, delete: t.delete, close: t.close, edit: t.edit,
   }
-  const sl = STATUS_LABELS[lang] || STATUS_LABELS.en
-
-  const VM = {
-    uk: { details:'Деталі книги', progress:'Прогрес читання', pages:'сторінок', page:'стор.', save:'Зберегти', language:'Мова', year:'Рік', pgLabel:'Сторінок', quotes:'Цитати з цієї книги', delete:'Видалити', close:'Закрити', edit:'Редагувати' },
-    en: { details:'Book Details', progress:'Reading progress', pages:'pages', page:'p.', save:'Save', language:'Language', year:'Year', pgLabel:'Pages', quotes:'Quotes from this book', delete:'Delete', close:'Close', edit:'Edit' },
-    ru: { details:'Детали книги', progress:'Прогресс чтения', pages:'страниц', page:'стр.', save:'Сохранить', language:'Язык', year:'Год', pgLabel:'Страниц', quotes:'Цитаты из этой книги', delete:'Удалить', close:'Закрыть', edit:'Редактировать' },
-    sv: { details:'Bokdetaljer', progress:'Läsframsteg', pages:'sidor', page:'s.', save:'Spara', language:'Språk', year:'År', pgLabel:'Sidor', quotes:'Citat från denna bok', delete:'Ta bort', close:'Stäng', edit:'Redigera' },
-    de: { details:'Buchdetails', progress:'Lesefortschritt', pages:'Seiten', page:'S.', save:'Speichern', language:'Sprache', year:'Jahr', pgLabel:'Seiten', quotes:'Zitate aus diesem Buch', delete:'Löschen', close:'Schließen', edit:'Bearbeiten' },
-    es: { details:'Detalles del libro', progress:'Progreso de lectura', pages:'páginas', page:'p.', save:'Guardar', language:'Idioma', year:'Año', pgLabel:'Páginas', quotes:'Citas de este libro', delete:'Eliminar', close:'Cerrar', edit:'Editar' },
-  }
-  const vm = VM[lang] || VM.en
 
   const tags     = book.tags ? book.tags.split(',').map(t => t.trim()).filter(Boolean) : []
   const coverSrc = book.cover_local ? `file://${book.cover_local}` : book.cover_url

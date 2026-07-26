@@ -30,7 +30,7 @@ export default function Sidebar({ view, setView, counts, t }) {
 
         <button className={`nav-item ${view==='shelves'?'active':''}`} onClick={()=>setView('shelves')} style={{marginTop:4}}>
           <span className="nav-item-icon">🗂️</span>
-          {t.shelves || 'Полиці'}
+          {t.shelves}
         </button>
 
         <div className="nav-rule"><span>❦</span></div>

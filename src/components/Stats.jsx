@@ -1,25 +1,16 @@
 import { useEffect, useState } from 'react'
-
-const T = {
-  uk: {
-    total:'Всього книг', read:'Прочитано', reading:'Читаю зараз', avgRating:'Середня оцінка',
-    readPeriod:'Книг прочитано', pagesPeriod:'Сторінок прочитано',
-    today:'Сьогодні', thisWeek:'Цей тиждень', thisYear:'Цей рік', allTime:'За весь час',
-    languages:'Мови читання', byYear:'По роках', quotes:'Цитат записано',
-    books:'кн.', pages:'стор.',
-  },
-  en: {
-    total:'Total Books', read:'Read', reading:'Reading Now', avgRating:'Avg Rating',
-    readPeriod:'Books Read', pagesPeriod:'Pages Read',
-    today:'Today', thisWeek:'This Week', thisYear:'This Year', allTime:'All Time',
-    languages:'Reading Languages', byYear:'By Year', quotes:'Quotes Saved',
-    books:'bk.', pages:'pp.',
-  },
-}
+import { getT } from '../i18n'
 
 export default function Stats({ lang }) {
   const [stats, setStats] = useState(null)
-  const t = T[lang] || T.uk
+  const g = getT(lang)
+  const t = {
+    total: g.totalBooks, read: g.readCount, reading: g.readingNow, avgRating: g.avgRating,
+    readPeriod: g.booksReadStat, pagesPeriod: g.pagesReadStat,
+    today: g.today, thisWeek: g.thisWeek, thisYear: g.thisYear, allTime: g.allTime,
+    languages: g.languagesReading, byYear: g.byYear, quotes: g.quotesSaved,
+    books: g.statBooksAbbr, pages: g.statPagesAbbr,
+  }
 
   useEffect(() => { window.api.getStats().then(setStats) }, [])
 

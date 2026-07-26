@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { getT, fmt } from '../i18n'
 
-export default function Quotes() {
+export default function Quotes({ lang }) {
+  const t = getT(lang)
   const [quotes, setQuotes]   = useState([])
   const [books, setBooks]     = useState([])
   const [filter, setFilter]   = useState('')   // book_id filter
@@ -27,8 +29,8 @@ export default function Quotes() {
   }
 
   const handleSave = async () => {
-    if (!form.book_id) { alert('Обери книгу'); return }
-    if (!form.text.trim()) { alert('Введи текст цитати'); return }
+    if (!form.book_id) { alert(t.pickBookAlert); return }
+    if (!form.text.trim()) { alert(t.enterQuoteAlert); return }
     const payload = { ...form, book_id: parseInt(form.book_id), page: form.page ? parseInt(form.page) : null }
     if (editQ) { await window.api.updateQuote({ ...payload, id: editQ.id }) }
     else       { await window.api.addQuote(payload) }
@@ -36,7 +38,7 @@ export default function Quotes() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Видалити цю цитату?')) return
+    if (!confirm(t.deleteQuoteConfirm)) return
     await window.api.deleteQuote(id)
     load()
   }
@@ -50,25 +52,25 @@ export default function Quotes() {
       {/* Header */}
       <div style={{display:'flex',gap:10,alignItems:'center',marginBottom:20}}>
         <div style={{background:'var(--purple-bg)',border:'1px solid var(--purple)',borderRadius:8,padding:'4px 10px',fontSize:12,color:'var(--purple)',fontWeight:600}}>
-          ✨ Експериментальна функція
+          {t.experimentalFeature}
         </div>
         <div style={{flex:1}} />
         <select value={filter} onChange={e=>setFilter(e.target.value)}
           style={{background:'var(--bg2)',border:'1px solid var(--border)',borderRadius:'var(--radius)',color:'var(--text2)',fontSize:13,padding:'5px 10px',fontFamily:'inherit',outline:'none'}}>
-          <option value="">Всі книги</option>
+          <option value="">{t.allBooks}</option>
           {books.filter(b=>b.status!=='later').map(b=>(
             <option key={b.id} value={b.id}>{b.title}</option>
           ))}
         </select>
-        <button className="btn-add" onClick={openAdd}>+ Додати цитату</button>
+        <button className="btn-add" onClick={openAdd}>{t.addQuoteBtn}</button>
       </div>
 
       {/* Quotes list */}
       {filtered.length === 0 ? (
         <div className="empty-state" style={{gridColumn:'unset'}}>
           <div className="empty-state-icon">💬</div>
-          <h3>Цитат ще немає</h3>
-          <p>Натисни "+ Додати цитату" щоб зберегти важливий уривок з книги</p>
+          <h3>{t.noQuotesTitle}</h3>
+          <p>{t.noQuotesHint}</p>
         </div>
       ) : (
         <div style={{display:'flex',flexDirection:'column',gap:12}}>
@@ -89,7 +91,7 @@ export default function Quotes() {
                 </div>
                 <div>
                   <div style={{fontSize:13,fontWeight:500,color:'var(--text)'}}>{q.book_title}</div>
-                  <div style={{fontSize:11,color:'var(--text3)'}}>{q.book_author}{q.page?` · стор. ${q.page}`:''}</div>
+                  <div style={{fontSize:11,color:'var(--text3)'}}>{q.book_author}{q.page?fmt(t.quotePageInline,{page:q.page}):''}</div>
                 </div>
                 {q.note && (
                   <div style={{marginLeft:'auto',maxWidth:200,fontSize:12,color:'var(--text3)',fontStyle:'italic',textAlign:'right'}}>
@@ -113,15 +115,15 @@ export default function Quotes() {
         <div className="modal-overlay" onClick={()=>setAddOpen(false)}>
           <div className="modal" style={{maxWidth:480}} onClick={e=>e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editQ ? 'Редагувати цитату' : 'Нова цитата'}</h2>
+              <h2>{editQ ? t.editQuoteTitle : t.newQuoteTitle}</h2>
               <button className="modal-close" onClick={()=>setAddOpen(false)}>✕</button>
             </div>
 
             <div className="form-group">
-              <label>Книга *</label>
+              <label>{t.labelBookRequired}</label>
               <select value={form.book_id} onChange={e=>setForm(f=>({...f,book_id:e.target.value}))}
                 style={{width:'100%',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'var(--radius)',color:'var(--text)',fontSize:14,padding:'9px 12px',fontFamily:'inherit',outline:'none'}}>
-                <option value="">— Обери книгу —</option>
+                <option value="">{t.chooseBookOption}</option>
                 {books.filter(b=>b.status!=='later').map(b=>(
                   <option key={b.id} value={b.id}>{b.title}{b.author?` — ${b.author}`:''}</option>
                 ))}
@@ -129,30 +131,30 @@ export default function Quotes() {
             </div>
 
             <div className="form-group">
-              <label>Текст цитати *</label>
+              <label>{t.labelQuoteTextRequired}</label>
               <textarea value={form.text} onChange={e=>setForm(f=>({...f,text:e.target.value}))}
-                placeholder="Вставте або введіть текст цитати..." autoFocus
+                placeholder={t.placeholderQuoteText} autoFocus
                 style={{width:'100%',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'var(--radius)',color:'var(--text)',fontSize:14,padding:'9px 12px',fontFamily:'inherit',outline:'none',resize:'vertical',minHeight:100,lineHeight:1.6}} />
             </div>
 
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
               <div className="form-group">
-                <label>Сторінка</label>
+                <label>{t.labelPage}</label>
                 <input type="number" value={form.page} onChange={e=>setForm(f=>({...f,page:e.target.value}))}
                   placeholder="123" min="1"
                   style={{width:'100%',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'var(--radius)',color:'var(--text)',fontSize:14,padding:'9px 12px',fontFamily:'inherit',outline:'none'}} />
               </div>
               <div className="form-group">
-                <label>Нотатка</label>
+                <label>{t.labelNote}</label>
                 <input value={form.note} onChange={e=>setForm(f=>({...f,note:e.target.value}))}
-                  placeholder="Коментар до цитати..."
+                  placeholder={t.placeholderNote}
                   style={{width:'100%',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'var(--radius)',color:'var(--text)',fontSize:14,padding:'9px 12px',fontFamily:'inherit',outline:'none'}} />
               </div>
             </div>
 
             <div className="modal-footer">
-              <button className="btn" onClick={()=>setAddOpen(false)}>Скасувати</button>
-              <button className="btn btn-primary" onClick={handleSave}>{editQ?'💾 Зберегти':'➕ Додати'}</button>
+              <button className="btn" onClick={()=>setAddOpen(false)}>{t.cancel}</button>
+              <button className="btn btn-primary" onClick={handleSave}>{editQ?t.saveBtn:t.addBtn}</button>
             </div>
           </div>
         </div>

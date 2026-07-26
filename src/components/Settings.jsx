@@ -1,134 +1,6 @@
 import { useState, useEffect } from 'react'
 import track from '../useTrack'
-
-const T = {
-  uk: {
-    settings:'Налаштування', language:'Мова інтерфейсу',
-    languageDesc:'Оберіть мову відображення застосунку',
-    appearance:'Вигляд', theme:'Темна',
-    themeNote:'Більше тем буде додано пізніше',
-    about:'Про застосунок', version:'Версія',
-    builtWith:'Зроблено з ❤️ за допомогою Electron + React + SQLite',
-    saved:'✓ Збережено',
-    themeTitle:'Тема оформлення', themeDark:'Темна', themeLight:'Світла', themeSystem:'Як в системі',
-    dataTitle:'Дані', exportJSON:'Експорт бібліотеки (JSON)',
-    exportDesc:'Зберегти всі книги, цитати та полиці у файл для переносу',
-    exportBtn:'📤 Експортувати', importBtn:'📥 Імпортувати',
-    importDesc:'Завантажити бібліотеку з раніше збереженого JSON файлу',
-    importWarning:'Існуючі книги не видаляються — нові додаються поряд',
-    analyticsTitle:'Аналітика для розробника',
-    analyticsDesc:'Статистика використання застосунку — без особистих даних. Допомагає зрозуміти що працює, а що ні.',
-    analyticsBtn:'📊 Вигрузити аналітику',
-    analyticsNote:'Файл містить: кількість кліків по функціях, активність по днях, статистику бібліотеки. Жодних особистих даних.',
-    success:'✓ Готово', error:'Помилка',
-    checking:'Перевіряю...', checked:'✓ Перевірено', updateDevMode:'Недоступно в режимі розробки', checkUpdateBtn:'🔄 Перевірити оновлення',
-  },
-  en: {
-    settings:'Settings', language:'Interface Language',
-    languageDesc:'Choose the display language of the app',
-    appearance:'Appearance', theme:'Dark',
-    themeNote:'More themes coming soon',
-    about:'About', version:'Version',
-    builtWith:'Made with ❤️ using Electron + React + SQLite',
-    saved:'✓ Saved',
-    themeTitle:'Theme', themeDark:'Dark', themeLight:'Light', themeSystem:'System',
-    dataTitle:'Data', exportJSON:'Export Library (JSON)',
-    exportDesc:'Save all books, quotes and shelves to a file for transfer',
-    exportBtn:'📤 Export', importBtn:'📥 Import',
-    importDesc:'Load library from a previously saved JSON file',
-    importWarning:'Existing books are not deleted — new ones are added alongside',
-    analyticsTitle:'Developer Analytics',
-    analyticsDesc:'App usage statistics — no personal data. Helps understand what works and what doesn\'t.',
-    analyticsBtn:'📊 Export Analytics',
-    analyticsNote:'File contains: feature click counts, daily activity, library stats. No personal data.',
-    success:'✓ Done', error:'Error',
-    checking:'Checking...', checked:'✓ Checked', updateDevMode:'Not available in dev mode', checkUpdateBtn:'🔄 Check for updates',
-  },
-  ru: {
-    settings:'Настройки', language:'Язык интерфейса',
-    languageDesc:'Выберите язык отображения приложения',
-    appearance:'Внешний вид', theme:'Тёмная',
-    themeNote:'Больше тем появится позже',
-    about:'О приложении', version:'Версия',
-    builtWith:'Сделано с ❤️ на Electron + React + SQLite',
-    saved:'✓ Сохранено',
-    themeTitle:'Тема оформления', themeDark:'Тёмная', themeLight:'Светлая', themeSystem:'Как в системе',
-    dataTitle:'Данные', exportJSON:'Экспорт библиотеки (JSON)',
-    exportDesc:'Сохранить все книги, цитаты и полки в файл для переноса',
-    exportBtn:'📤 Экспортировать', importBtn:'📥 Импортировать',
-    importDesc:'Загрузить библиотеку из ранее сохранённого JSON файла',
-    importWarning:'Существующие книги не удаляются — новые добавляются рядом',
-    analyticsTitle:'Аналитика для разработчика',
-    analyticsDesc:'Статистика использования приложения — без личных данных.',
-    analyticsBtn:'📊 Выгрузить аналитику',
-    analyticsNote:'Файл содержит: количество кликов по функциям, активность по дням, статистику библиотеки.',
-    success:'✓ Готово', error:'Ошибка',
-    checking:'Проверяю...', checked:'✓ Проверено', updateDevMode:'Недоступно в режиме разработки', checkUpdateBtn:'🔄 Проверить обновления',
-  },
-  sv: {
-    settings:'Inställningar', language:'Gränssnittsspråk',
-    languageDesc:'Välj appens visningsspråk',
-    appearance:'Utseende', theme:'Mörkt',
-    themeNote:'Fler teman kommer snart',
-    about:'Om appen', version:'Version',
-    builtWith:'Gjord med ❤️ med Electron + React + SQLite',
-    saved:'✓ Sparat',
-    themeTitle:'Tema', themeDark:'Mörkt', themeLight:'Ljust', themeSystem:'Systemval',
-    dataTitle:'Data', exportJSON:'Exportera bibliotek (JSON)',
-    exportDesc:'Spara alla böcker, citat och hyllor till en fil för överföring',
-    exportBtn:'📤 Exportera', importBtn:'📥 Importera',
-    importDesc:'Ladda bibliotek från en tidigare sparad JSON-fil',
-    importWarning:'Befintliga böcker tas inte bort — nya läggs till bredvid',
-    analyticsTitle:'Utvecklaranalys',
-    analyticsDesc:'Användningsstatistik för appen — inga personuppgifter.',
-    analyticsBtn:'📊 Exportera analys',
-    analyticsNote:'Filen innehåller: funktionsklick, daglig aktivitet, biblioteksstatistik.',
-    success:'✓ Klart', error:'Fel',
-    checking:'Kontrollerar...', checked:'✓ Kontrollerat', updateDevMode:'Ej tillgängligt i utvecklingsläge', checkUpdateBtn:'🔄 Sök efter uppdateringar',
-  },
-  de: {
-    settings:'Einstellungen', language:'Oberflächensprache',
-    languageDesc:'Anzeigesprache der App auswählen',
-    appearance:'Erscheinungsbild', theme:'Dunkel',
-    themeNote:'Weitere Themen folgen bald',
-    about:'Über die App', version:'Version',
-    builtWith:'Mit ❤️ erstellt mit Electron + React + SQLite',
-    saved:'✓ Gespeichert',
-    themeTitle:'Design-Thema', themeDark:'Dunkel', themeLight:'Hell', themeSystem:'Wie das System',
-    dataTitle:'Daten', exportJSON:'Bibliothek exportieren (JSON)',
-    exportDesc:'Alle Bücher, Zitate und Regale in eine Datei zum Transfer speichern',
-    exportBtn:'📤 Exportieren', importBtn:'📥 Importieren',
-    importDesc:'Bibliothek aus einer zuvor gespeicherten JSON-Datei laden',
-    importWarning:'Vorhandene Bücher werden nicht gelöscht — neue werden hinzugefügt',
-    analyticsTitle:'Entwickler-Analytik',
-    analyticsDesc:'Nutzungsstatistik der App — keine persönlichen Daten.',
-    analyticsBtn:'📊 Analytik exportieren',
-    analyticsNote:'Datei enthält: Feature-Klicks, tägliche Aktivität, Bibliotheksstatistik.',
-    success:'✓ Fertig', error:'Fehler',
-    checking:'Prüfe...', checked:'✓ Geprüft', updateDevMode:'Im Entwicklungsmodus nicht verfügbar', checkUpdateBtn:'🔄 Auf Updates prüfen',
-  },
-  es: {
-    settings:'Configuración', language:'Idioma de la interfaz',
-    languageDesc:'Elige el idioma de visualización de la aplicación',
-    appearance:'Apariencia', theme:'Oscuro',
-    themeNote:'Más temas próximamente',
-    about:'Acerca de', version:'Versión',
-    builtWith:'Hecho con ❤️ usando Electron + React + SQLite',
-    saved:'✓ Guardado',
-    themeTitle:'Tema de diseño', themeDark:'Oscuro', themeLight:'Claro', themeSystem:'Como el sistema',
-    dataTitle:'Datos', exportJSON:'Exportar biblioteca (JSON)',
-    exportDesc:'Guardar todos los libros, citas y estantes en un archivo para transferencia',
-    exportBtn:'📤 Exportar', importBtn:'📥 Importar',
-    importDesc:'Cargar biblioteca desde un archivo JSON guardado anteriormente',
-    importWarning:'Los libros existentes no se eliminan — los nuevos se añaden junto a ellos',
-    analyticsTitle:'Analítica para desarrolladores',
-    analyticsDesc:'Estadísticas de uso de la app — sin datos personales.',
-    analyticsBtn:'📊 Exportar analítica',
-    analyticsNote:'El archivo contiene: clics en funciones, actividad diaria, estadísticas de biblioteca.',
-    success:'✓ Listo', error:'Error',
-    checking:'Comprobando...', checked:'✓ Comprobado', updateDevMode:'No disponible en modo desarrollo', checkUpdateBtn:'🔄 Buscar actualizaciones',
-  },
-}
+import { getT, fmt, TRANSLATED } from '../i18n'
 
 export const LANG_OPTIONS = [
   { value:'uk',  flag:'🇺🇦', native:'Українська'      },
@@ -168,8 +40,6 @@ export const LANG_OPTIONS = [
   { value:'ms',  flag:'🇲🇾', native:'Bahasa Melayu'    },
 ]
 
-const TRANSLATED = new Set(['uk','en','ru','sv','de','es'])
-
 export default function Settings({ lang, setLang, theme, setTheme }) {
   const [langSaved, setLangSaved]       = useState(false)
   const [langSearch, setLangSearch]     = useState('')
@@ -178,28 +48,30 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
   const [importMsg, setImportMsg]       = useState('')
   const [analyticsStatus, setAnalyticsStatus] = useState(null)
   const [updateMsg, setUpdateMsg]       = useState('')
+  const [updateErr, setUpdateErr]       = useState(false)
   const [appVersion, setAppVersion]     = useState('')
 
   useEffect(() => {
     window.api.getAppVersion().then(v => setAppVersion(v)).catch(() => {})
   }, [])
 
-  const t = T[TRANSLATED.has(lang) ? lang : 'en']
+  const t = getT(lang)
   const current = LANG_OPTIONS.find(o => o.value === lang)
-  const uk = lang !== 'en'
 
   const handleCheckUpdate = async () => {
-    setUpdateMsg(t.checking || 'Checking...')
+    setUpdateErr(false)
+    setUpdateMsg(t.checking)
     track('feature:check_update')
     const res = await window.api.checkForUpdate()
     if (res?.dev) {
-      setUpdateMsg(t.updateDevMode || 'Not available in dev mode')
+      setUpdateMsg(t.updateDevMode)
       setTimeout(() => setUpdateMsg(''), 4000)
     } else if (res?.error) {
-      setUpdateMsg(`${t.error}: ${res.error}`)
+      setUpdateErr(true)
+      setUpdateMsg(fmt(t.errorWithDetail, { error: t.error, detail: res.error }))
       // do not auto-hide errors — user needs to read/copy them
     } else {
-      setUpdateMsg(t.checked || '✓ Checked')
+      setUpdateMsg(t.checked)
       setTimeout(() => setUpdateMsg(''), 4000)
     }
   }
@@ -226,10 +98,10 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
     if (res?.canceled) return
     if (res?.success) {
       setImportStatus('ok')
-      setImportMsg(`${t.success}: додано ${res.count} книг`)
+      setImportMsg(fmt(t.importSuccess, { success: t.success, count: res.count }))
     } else {
       setImportStatus('err')
-      setImportMsg(`${t.error}: ${res?.error || ''}`)
+      setImportMsg(fmt(t.errorWithDetail, { error: t.error, detail: res?.error || '' }))
     }
     setTimeout(() => { setImportStatus(null); setImportMsg('') }, 4000)
   }
@@ -257,7 +129,7 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
           <div>
             <div style={{fontSize:13,fontWeight:600,color:'var(--purple)'}}>{current?.native}</div>
             <div style={{fontSize:11,color:'var(--text3)'}}>
-              {TRANSLATED.has(lang) ? (lang==='uk'?'Повний переклад інтерфейсу':'Full UI translation') : 'UI displayed in English'}
+              {TRANSLATED.has(lang) ? t.fullUITranslation : t.uiInEnglish}
             </div>
           </div>
           {langSaved && <span style={{marginLeft:'auto',fontSize:12,color:'var(--green)',fontWeight:500}}>{t.saved}</span>}
@@ -265,7 +137,7 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
         <div style={{position:'relative',marginBottom:10}}>
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:'var(--text3)',fontSize:14}}>🔍</span>
           <input value={langSearch} onChange={e=>setLangSearch(e.target.value)}
-            placeholder={lang==='uk'?'Пошук мови...':'Search language...'}
+            placeholder={t.searchLanguagePlaceholder}
             style={{width:'100%',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:'var(--radius)',color:'var(--text)',fontSize:13,padding:'8px 12px 8px 32px',fontFamily:'inherit',outline:'none'}} />
         </div>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(155px,1fr))',gap:6,maxHeight:300,overflowY:'auto',paddingRight:2}}>
@@ -297,8 +169,8 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
           <div style={{fontSize:12,color:'var(--text3)',marginBottom:10,lineHeight:1.5}}>{t.exportDesc}</div>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
             <button className="btn btn-primary" onClick={handleExport}>{t.exportBtn}</button>
-            {exportStatus==='ok'  && <span style={{fontSize:12,color:'var(--green)'}}>✓ Збережено</span>}
-            {exportStatus==='err' && <span style={{fontSize:12,color:'var(--red)'}}>✗ Помилка</span>}
+            {exportStatus==='ok'  && <span style={{fontSize:12,color:'var(--green)'}}>{t.saved}</span>}
+            {exportStatus==='err' && <span style={{fontSize:12,color:'var(--red)'}}>✗ {t.error}</span>}
           </div>
         </div>
 
@@ -371,11 +243,11 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
               <button className="btn" onClick={handleCheckUpdate}>
                 {t.checkUpdateBtn || '🔄 Check for updates'}
               </button>
-              {updateMsg && !updateMsg.startsWith('Error') && !updateMsg.startsWith('Помилка') && (
+              {updateMsg && !updateErr && (
                 <span style={{fontSize:12,color:'var(--text3)'}}>{updateMsg}</span>
               )}
             </div>
-            {updateMsg && (updateMsg.startsWith('Error') || updateMsg.startsWith('Помилка')) && (
+            {updateMsg && updateErr && (
               <div style={{
                 background:'var(--red-bg)', border:'1px solid var(--red)', borderRadius:'var(--radius)',
                 padding:'10px 12px', fontSize:12, color:'var(--text)', lineHeight:1.5,
@@ -385,7 +257,7 @@ export default function Settings({ lang, setLang, theme, setTheme }) {
                 <div style={{marginTop:8}}>
                   <button className="btn" style={{height:26,fontSize:11,padding:'0 10px'}}
                     onClick={() => window.api.openUpdateLog()}>
-                    {uk?'📄 Відкрити повний лог':'📄 Open full log'}
+                    {t.openFullLog}
                   </button>
                 </div>
               </div>

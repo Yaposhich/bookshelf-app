@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
+import { getT, fmt } from '../i18n'
 
 export default function UpdateBanner({ lang }) {
   const [status, setStatus]       = useState(null)
   const [dismissed, setDismissed] = useState(false)
   const [installing, setInstalling] = useState(false)
-  const uk = lang !== 'en'
+  const t = getT(lang)
 
   useEffect(() => {
     if (!window.api?.onUpdaterStatus) return
@@ -47,14 +48,14 @@ export default function UpdateBanner({ lang }) {
           <span style={{fontSize:22,flexShrink:0}}>🔔</span>
           <div style={{flex:1}}>
             <div style={{fontSize:13,fontWeight:500,color:'var(--text)',marginBottom:3}}>
-              {uk ? `Нова версія ${status.version}` : `Update ${status.version} available`}
+              {fmt(t.updateAvailable, { version: status.version })}
             </div>
             <div style={{display:'flex',gap:6,marginTop:6}}>
               <button onClick={handleDownload} className="btn btn-primary" style={{height:26,padding:'0 10px',fontSize:11.5}}>
-                {uk ? '⬇ Завантажити' : '⬇ Download'}
+                {t.updateDownloadBtn}
               </button>
               <button onClick={() => setDismissed(true)} className="btn" style={{height:26,padding:'0 10px',fontSize:11.5}}>
-                {uk ? 'Пізніше' : 'Later'}
+                {t.updateLaterBtn}
               </button>
             </div>
           </div>
@@ -67,7 +68,7 @@ export default function UpdateBanner({ lang }) {
           <span style={{fontSize:22,flexShrink:0}}>⬇️</span>
           <div style={{flex:1}}>
             <div style={{fontSize:12,color:'var(--text2)',marginBottom:6}}>
-              {uk ? 'Завантаження оновлення...' : 'Downloading update...'}
+              {t.updateDownloading}
               {status.percent ? ` ${status.percent}%` : ''}
             </div>
             <div style={{height:4,background:'var(--bg4)',borderRadius:2,overflow:'hidden'}}>
@@ -83,10 +84,10 @@ export default function UpdateBanner({ lang }) {
           <span style={{fontSize:22,flexShrink:0}}>✨</span>
           <div style={{flex:1}}>
             <div style={{fontSize:13,fontWeight:500,color:'var(--text)',marginBottom:2}}>
-              {uk ? `Версія ${status.version} готова` : `Version ${status.version} ready`}
+              {fmt(t.updateReady, { version: status.version })}
             </div>
             <div style={{fontSize:11,color:'var(--text3)',marginBottom:8}}>
-              {uk ? 'Перезапустіть щоб встановити' : 'Restart to install'}
+              {t.updateReadyRestartHint}
             </div>
             <div style={{display:'flex',gap:6}}>
               <button
@@ -95,10 +96,10 @@ export default function UpdateBanner({ lang }) {
                 className="btn btn-primary"
                 style={{height:26,padding:'0 10px',fontSize:11.5,opacity:installing?0.6:1}}
               >
-                {installing ? (uk?'Закриваю...':'Closing...') : (uk?'🔄 Перезапустити':'🔄 Restart')}
+                {installing ? t.updateClosing : t.updateRestartBtn}
               </button>
               <button onClick={() => setDismissed(true)} className="btn" style={{height:26,padding:'0 10px',fontSize:11.5}}>
-                {uk ? 'Пізніше' : 'Later'}
+                {t.updateLaterBtn}
               </button>
             </div>
           </div>

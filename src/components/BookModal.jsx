@@ -1,9 +1,10 @@
 import track from '../useTrack'
 import { useState, useEffect, useRef } from 'react'
+import { getT, fmt } from '../i18n'
 
 const EMOJIS_MAIN = ['📚','📖','🔖']
 const EMOJIS_ALL  = ['📚','📖','📕','📗','📘','📙','🔖','✍️','💡','🌍','🎭','🔬','🧠','💼','🏛️','⚔️','🚀','🌿','🎨','🎵','🌊','🔮','🦁','🌺','⚡','👤','🏆','🌙','🎯','🧩']
-const LANGUAGES   = ['🇺🇦 Українська','🇬🇧 English','🇸🇪 Svenska','🇷🇺 Русский','🇩🇪 Deutsch','🇫🇷 Français','🇪🇸 Español','🇵🇱 Polski','🇮🇹 Italiano','🇳🇴 Norsk','Інша']
+const LANGUAGES   = ['🇺🇦 Українська','🇬🇧 English','🇸🇪 Svenska','🇷🇺 Русский','🇩🇪 Deutsch','🇫🇷 Français','🇪🇸 Español','🇵🇱 Polski','🇮🇹 Italiano','🇳🇴 Norsk']
 const EMPTY = { title:'', author:'', genre:'', status:'read', rating:0, language:'', year_read:'', comment:'', cover_emoji:'📚', cover_url:'', cover_local:'', ol_key:'', total_pages:'', current_page:'', tags:[] }
 
 // ── Google Books API key ──────────────────────────────────────────
@@ -15,9 +16,22 @@ const SOURCES = {
     label: 'Google Books',
     icon: '🔵',
     search: async (q) => {
-      const res  = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=12&printType=books&key=${GOOGLE_API_KEY}`)
-      const data = await res.json()
-      if (data.error) { console.error('Google Books API error:', data.error); return [] }
+      // Google Books' backend throws transient 503 (backendFailed) fairly often
+      // on the shared key — retry a few times before giving up, and THROW on a
+      // persistent error so the caller can fall back to Open Library.
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=12&printType=books&key=${GOOGLE_API_KEY}`
+      let data
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const res = await fetch(url)
+        data = await res.json()
+        if (!data.error) break
+        if (data.error.code !== 503) break // 429/quota etc. won't recover on retry
+        await new Promise(r => setTimeout(r, 400 * (attempt + 1)))
+      }
+      if (data.error) {
+        console.error('Google Books API error:', data.error)
+        throw new Error(`Google Books ${data.error.code}`)
+      }
       return (data.items || []).map(item => {
         const info = item.volumeInfo || {}
         return {
@@ -76,7 +90,8 @@ function guessEmoji(genres) {
   return '📚'
 }
 
-export default function BookModal({ book, onSave, onClose }) {
+export default function BookModal({ book, lang, onSave, onClose }) {
+  const t = getT(lang)
   const [form, setForm]           = useState(EMPTY)
   const [tagInput, setTagInput]   = useState('')
   const [query, setQuery]         = useState('')
@@ -118,11 +133,23 @@ export default function BookModal({ book, onSave, onClose }) {
   const doSearch = async (q, src) => {
     setSearching(true); setSearched(true)
     track('book:search', { source: src })
+    const other = src === 'google' ? 'openlibrary' : 'google'
     try {
-      const items = await SOURCES[src].search(q)
-      setResults(items)
+      let items = await SOURCES[src].search(q)
+      // If the chosen source (esp. flaky Google Books) returns nothing, quietly
+      // fall back to the other source so the user always gets results.
+      if (!items || items.length === 0) {
+        try { const alt = await SOURCES[other].search(q); if (alt.length) items = alt } catch {}
+      }
+      setResults(items || [])
     } catch(e) {
-      console.error(e); setResults([])
+      console.error(e)
+      // Selected source errored — try the other one before giving up.
+      try {
+        setResults(await SOURCES[other].search(q))
+      } catch(e2) {
+        console.error(e2); setResults([])
+      }
     }
     setSearching(false)
   }
@@ -151,20 +178,20 @@ export default function BookModal({ book, onSave, onClose }) {
   }
 
   const handlePickCover = async () => {
-    if (!book?.id) return alert('Спочатку збережи книгу, потім зміни обкладинку')
+    if (!book?.id) return alert(t.pickCoverFirstSave)
     const localPath = await window.api.pickCover(book.id)
     if (localPath) { set('cover_local', localPath); set('cover_url', '') }
   }
 
-  const addTag = () => { const t=tagInput.trim(); if(t&&!form.tags.includes(t)) set('tags',[...form.tags,t]); setTagInput('') }
-  const removeTag = tag => set('tags', form.tags.filter(t=>t!==tag))
+  const addTag = () => { const v=tagInput.trim(); if(v&&!form.tags.includes(v)) set('tags',[...form.tags,v]); setTagInput('') }
+  const removeTag = tag => set('tags', form.tags.filter(x=>x!==tag))
   const handleTagKey = e => {
     if (e.key==='Enter'||e.key===',') { e.preventDefault(); addTag() }
     if (e.key==='Backspace'&&!tagInput&&form.tags.length) set('tags', form.tags.slice(0,-1))
   }
 
   const handleSave = () => {
-    if (!form.title.trim()) { alert('Вкажи назву книги'); return }
+    if (!form.title.trim()) { alert(t.titleRequiredAlert); return }
     onSave({ ...form,
       rating:       form.status!=='read' ? 0 : form.rating,
       year_read:    form.year_read    ? parseInt(form.year_read)    : null,
@@ -180,14 +207,14 @@ export default function BookModal({ book, onSave, onClose }) {
       <div className="modal" style={{maxWidth:580}} onClick={e=>e.stopPropagation()}>
         <div className="modal-scroll">
         <div className="modal-header">
-          <h2>{book ? 'Редагувати книгу' : 'Додати книгу'}</h2>
+          <h2>{book ? t.editBookTitle : t.addBookTitle}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
         {/* ── Tab switcher ── */}
         {!book && (
           <div style={{display:'flex',gap:4,marginBottom:16,borderBottom:'1px solid var(--border)'}}>
-            {[['search','🔍 Пошук'],['manual','✏️ Вручну']].map(([id,label])=>(
+            {[['search',t.tabSearch],['manual',t.tabManual]].map(([id,label])=>(
               <button key={id} onClick={()=>setTab(id)} style={{padding:'7px 16px',border:'none',background:'none',cursor:'pointer',fontFamily:'inherit',fontSize:13,fontWeight:500,color:tab===id?'var(--purple)':'var(--text2)',borderBottom:tab===id?'2px solid var(--purple)':'2px solid transparent',marginBottom:-1}}>
                 {label}
               </button>
@@ -219,7 +246,7 @@ export default function BookModal({ book, onSave, onClose }) {
             <div className="form-group">
               <div style={{position:'relative'}}>
                 <input value={query} onChange={e=>handleQueryChange(e.target.value)}
-                  placeholder={`Пошук через ${SOURCES[source].label}...`}
+                  placeholder={fmt(t.searchViaSource, { source: SOURCES[source].label })}
                   autoFocus style={{width:'100%',paddingRight:36}}
                   onKeyDown={e=>e.key==='Enter'&&query.trim()&&doSearch(query,source)} />
                 {searching
@@ -249,7 +276,7 @@ export default function BookModal({ book, onSave, onClose }) {
                       <div style={{fontSize:12,color:'var(--text2)',marginBottom:4}}>
                         {b.authors[0]||'—'}
                         {b.year?` · ${b.year}`:''}
-                        {b.pages?` · ${b.pages} стор.`:''}
+                        {b.pages?fmt(t.pagesShortSuffix,{n:b.pages}):''}
                       </div>
                       {b.genres.length>0 && (
                         <div style={{fontSize:11,color:'var(--text3)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
@@ -257,7 +284,7 @@ export default function BookModal({ book, onSave, onClose }) {
                         </div>
                       )}
                     </div>
-                    <div style={{fontSize:11,color:'var(--purple)',alignSelf:'center',flexShrink:0,fontWeight:500}}>Обрати →</div>
+                    <div style={{fontSize:11,color:'var(--purple)',alignSelf:'center',flexShrink:0,fontWeight:500}}>{t.chooseArrow}</div>
                   </div>
                 ))}
               </div>
@@ -265,15 +292,15 @@ export default function BookModal({ book, onSave, onClose }) {
 
             {searched && !searching && results.length===0 && (
               <div style={{textAlign:'center',padding:'24px',color:'var(--text3)',fontSize:13}}>
-                Нічого не знайдено — спробуй інший запит або
-                <button onClick={()=>setTab('manual')} style={{background:'none',border:'none',color:'var(--purple)',cursor:'pointer',fontSize:13,padding:'0 4px',fontFamily:'inherit'}}>додай вручну</button>
+                {t.searchNoResultsPrefix}
+                <button onClick={()=>setTab('manual')} style={{background:'none',border:'none',color:'var(--purple)',cursor:'pointer',fontSize:13,padding:'0 4px',fontFamily:'inherit'}}>{t.addManuallyLink}</button>
               </div>
             )}
 
             {!searched && (
               <div style={{textAlign:'center',padding:'28px 20px',color:'var(--text3)',fontSize:13,lineHeight:1.7}}>
-                {SOURCES[source].icon} Введи назву книги або автора<br/>
-                <span style={{fontSize:12}}>Натисни Enter або зачекай 0.5 сек</span>
+                {SOURCES[source].icon} {t.searchPrompt}<br/>
+                <span style={{fontSize:12}}>{t.searchHint}</span>
               </div>
             )}
           </div>
@@ -284,10 +311,10 @@ export default function BookModal({ book, onSave, onClose }) {
           <>
             {/* Cover */}
             <div className="form-group">
-              <label>Обкладинка</label>
+              <label>{t.labelCover}</label>
               <div style={{display:'flex',gap:12,alignItems:'flex-start'}}>
                 <div style={{width:52,height:72,borderRadius:8,border:'1px solid var(--border)',background:'var(--bg3)',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,flexShrink:0,cursor:'pointer',position:'relative'}}
-                  onClick={handlePickCover} title="Клікни щоб завантажити фото">
+                  onClick={handlePickCover} title={t.coverUploadTooltip}>
                   {coverSrc ? <img src={coverSrc} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none'}} /> : form.cover_emoji}
                   <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.45)',display:'flex',alignItems:'center',justifyContent:'center',opacity:0,transition:'opacity 0.15s'}}
                     onMouseEnter={e=>e.currentTarget.style.opacity=1} onMouseLeave={e=>e.currentTarget.style.opacity=0}>
@@ -303,11 +330,11 @@ export default function BookModal({ book, onSave, onClose }) {
                       </div>
                     ))}
                     <button onClick={()=>setEmojiOpen(v=>!v)} style={{height:34,padding:'0 10px',borderRadius:8,border:'1px solid var(--border)',background:'var(--bg3)',color:'var(--text2)',cursor:'pointer',fontSize:12,fontFamily:'inherit'}}>
-                      {emojiOpen?'Сховати ▲':'Ще ▼'}
+                      {emojiOpen?t.emojiHide:t.emojiMore}
                     </button>
                     {book?.id && (
                       <button onClick={handlePickCover} style={{height:34,padding:'0 10px',borderRadius:8,border:'1px solid var(--border)',background:'var(--bg3)',color:'var(--text2)',cursor:'pointer',fontSize:12,fontFamily:'inherit'}}>
-                        📷 Своє фото
+                        {t.ownPhoto}
                       </button>
                     )}
                   </div>
@@ -327,42 +354,42 @@ export default function BookModal({ book, onSave, onClose }) {
 
             <div className="form-row">
               <div className="form-group" style={{gridColumn:'1/-1'}}>
-                <label>Назва *</label>
-                <input value={form.title} onChange={e=>set('title',e.target.value)} placeholder="Назва книги" autoFocus />
+                <label>{t.labelTitleRequired}</label>
+                <input value={form.title} onChange={e=>set('title',e.target.value)} placeholder={t.placeholderTitle} autoFocus />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>Автор</label>
-                <input value={form.author} onChange={e=>set('author',e.target.value)} placeholder="Ім'я автора" />
+                <label>{t.labelAuthor}</label>
+                <input value={form.author} onChange={e=>set('author',e.target.value)} placeholder={t.placeholderAuthor} />
               </div>
               <div className="form-group">
-                <label>Жанр</label>
-                <input value={form.genre} onChange={e=>set('genre',e.target.value)} placeholder="Фантастика, роман..." />
+                <label>{t.labelGenre}</label>
+                <input value={form.genre} onChange={e=>set('genre',e.target.value)} placeholder={t.placeholderGenre} />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>Статус</label>
+                <label>{t.labelStatus}</label>
                 <select value={form.status} onChange={e=>set('status',e.target.value)}>
-                  <option value="read">✅ Прочитав</option>
-                  <option value="reading">📖 Читаю зараз</option>
-                  <option value="later">🔖 Read Later</option>
+                  <option value="read">{t.statusRead}</option>
+                  <option value="reading">{t.statusReadingNow}</option>
+                  <option value="later">{t.statusReadLater}</option>
                 </select>
               </div>
               <div className="form-group">
-                <label>Рік прочитання</label>
+                <label>{t.labelYearRead}</label>
                 <input type="number" value={form.year_read} onChange={e=>set('year_read',e.target.value)} placeholder="2024" min="1900" max="2099" />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>Всього сторінок</label>
+                <label>{t.labelTotalPages}</label>
                 <input type="number" value={form.total_pages} onChange={e=>set('total_pages',e.target.value)} placeholder="328" min="1" />
               </div>
               {form.status==='reading' && (
                 <div className="form-group">
-                  <label>Поточна сторінка</label>
+                  <label>{t.labelCurrentPage}</label>
                   <input type="number" value={form.current_page} onChange={e=>set('current_page',e.target.value)} placeholder="0" min="0" max={form.total_pages||99999} />
                 </div>
               )}
@@ -372,7 +399,7 @@ export default function BookModal({ book, onSave, onClose }) {
                 {(()=>{
                   const pct=Math.min(100,Math.round((parseInt(form.current_page)||0)/parseInt(form.total_pages)*100))
                   return (<div>
-                    <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--text3)',marginBottom:4}}><span>Прогрес</span><span style={{color:'var(--amber)',fontWeight:500}}>{pct}%</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--text3)',marginBottom:4}}><span>{t.labelProgress}</span><span style={{color:'var(--amber)',fontWeight:500}}>{pct}%</span></div>
                     <div style={{height:6,background:'var(--bg4)',borderRadius:3,overflow:'hidden'}}><div style={{height:'100%',width:`${pct}%`,background:'var(--amber)',borderRadius:3,transition:'width 0.3s'}} /></div>
                   </div>)
                 })()}
@@ -380,7 +407,7 @@ export default function BookModal({ book, onSave, onClose }) {
             )}
             {form.status==='read' && (<>
               <div className="form-group">
-                <label>Оцінка</label>
+                <label>{t.labelRating}</label>
                 <div className="rating-picker">
                   {Array.from({length:10},(_,i)=>i+1).map(n=>(
                     <button key={n} className={`rating-pick ${n<=form.rating?'active':''}`} onClick={()=>set('rating',form.rating===n?0:n)}>{n}</button>
@@ -389,27 +416,28 @@ export default function BookModal({ book, onSave, onClose }) {
                 </div>
               </div>
               <div className="form-group">
-                <label>Мова читання</label>
+                <label>{t.labelReadingLanguage}</label>
                 <select value={form.language} onChange={e=>set('language',e.target.value)}>
-                  <option value="">— Не вказано —</option>
+                  <option value="">{t.languageNotSpecified}</option>
                   {LANGUAGES.map(l=><option key={l} value={l}>{l}</option>)}
+                  <option value="Інша">{t.langOther}</option>
                 </select>
               </div>
             </>)}
             <div className="form-group">
-              <label>Теги</label>
+              <label>{t.labelTags}</label>
               <div className="tags-input-wrap" onClick={()=>tagRef.current?.focus()}>
-                {form.tags.map(t=>(<span key={t} className="tag-chip">{t}<button className="tag-chip-remove" onClick={()=>removeTag(t)}>✕</button></span>))}
-                <input ref={tagRef} className="tag-input-bare" value={tagInput} onChange={e=>setTagInput(e.target.value)} onKeyDown={handleTagKey} onBlur={addTag} placeholder={form.tags.length?'':'Додай теги через Enter...'} />
+                {form.tags.map(tag=>(<span key={tag} className="tag-chip">{tag}<button className="tag-chip-remove" onClick={()=>removeTag(tag)}>✕</button></span>))}
+                <input ref={tagRef} className="tag-input-bare" value={tagInput} onChange={e=>setTagInput(e.target.value)} onKeyDown={handleTagKey} onBlur={addTag} placeholder={form.tags.length?'':t.placeholderTags} />
               </div>
             </div>
             <div className="form-group">
-              <label>Коментар / нотатки</label>
-              <textarea value={form.comment} onChange={e=>set('comment',e.target.value)} placeholder="Враження, думки, улюблені цитати..." />
+              <label>{t.labelComment}</label>
+              <textarea value={form.comment} onChange={e=>set('comment',e.target.value)} placeholder={t.placeholderComment} />
             </div>
             <div className="modal-footer">
-              <button className="btn" onClick={onClose}>Скасувати</button>
-              <button className="btn btn-primary" onClick={handleSave}>{book?'💾 Зберегти':'➕ Додати'}</button>
+              <button className="btn" onClick={onClose}>{t.cancel}</button>
+              <button className="btn btn-primary" onClick={handleSave}>{book?t.saveBtn:t.addBtn}</button>
             </div>
           </>
         )}
