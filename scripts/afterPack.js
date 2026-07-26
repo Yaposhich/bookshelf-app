@@ -12,6 +12,20 @@ exports.default = async function afterPack(context) {
   const { appOutDir, packager, electronPlatformName } = context
   if (electronPlatformName !== 'darwin') return
 
+  // When real Apple Developer credentials are present, electron-builder does a
+  // proper Developer ID signature + notarization right after this hook — skip
+  // ad-hoc signing so we don't fight it.
+  const hasAppleCreds = Boolean(
+    process.env.CSC_LINK &&
+    process.env.APPLE_ID &&
+    process.env.APPLE_APP_SPECIFIC_PASSWORD &&
+    process.env.APPLE_TEAM_ID
+  )
+  if (hasAppleCreds) {
+    console.log('✓ Apple credentials detected — skipping ad-hoc signing (Developer ID signing will run)')
+    return
+  }
+
   const appName = packager.appInfo.productFilename
   const appPath = `${appOutDir}/${appName}.app`
 

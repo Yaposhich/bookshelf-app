@@ -9,43 +9,8 @@
     "electron:dev": "electron .",
     "start": "concurrently \"vite\" \"electron .\"",
     "postinstall": "electron-builder install-app-deps",
-    "dist": "vite build && electron-builder",
-    "release": "vite build && electron-builder --publish always"
-  },
-  "build": {
-    "appId": "com.bookshelf.app",
-    "productName": "Bookshelf",
-    "afterPack": "scripts/afterPack.js",
-    "asar": true,
-    "asarUnpack": [
-      "node_modules/better-sqlite3/**/*"
-    ],
-    "publish": {
-      "provider": "github",
-      "owner": "Yaposhich",
-      "repo": "bookshelf-app"
-    },
-    "mac": {
-      "category": "public.app-category.productivity",
-      "target": [
-        { "target": "zip", "arch": ["x64", "arm64"] },
-        { "target": "dmg", "arch": ["x64", "arm64"] }
-      ],
-      "hardenedRuntime": false
-    },
-    "directories": {
-      "output": "dist-electron"
-    },
-    "files": [
-      "dist/**/*",
-      "electron/**/*",
-      "node_modules/better-sqlite3/build/Release/**/*",
-      "node_modules/better-sqlite3/lib/**/*",
-      "node_modules/better-sqlite3/package.json",
-      "node_modules/bindings/**/*",
-      "node_modules/file-uri-to-path/**/*"
-    ],
-    "npmRebuild": true
+    "dist": "vite build && electron-builder --config electron-builder.config.js",
+    "release": "vite build && electron-builder --config electron-builder.config.js --publish always"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
