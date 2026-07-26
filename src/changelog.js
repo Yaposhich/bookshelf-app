@@ -2,6 +2,16 @@
 // Shown in Settings → About → "What's new", and as a popup right after an update installs.
 export const CHANGELOG = [
   {
+    version: '1.4.1',
+    date: '2026-07-26',
+    uk: [
+      'Апка тепер відкривається без команди в терміналі — достатньо правого кліку → Open',
+    ],
+    en: [
+      'The app now opens without a Terminal command — just right-click → Open',
+    ],
+  },
+  {
     version: '1.4.0',
     date: '2026-07-26',
     uk: [
