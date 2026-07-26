@@ -2,6 +2,20 @@
 // Shown in Settings → About → "What's new", and as a popup right after an update installs.
 export const CHANGELOG = [
   {
+    version: '1.5.0',
+    date: '2026-07-26',
+    uk: [
+      'Повний переклад інтерфейсу на 22 мови (uk, en, de, fr, es, it, pt, pl, nl, sv, no, da, fi, cs, ro, hu, el, tr, ru + арабська, іврит, фарсі)',
+      'Підтримка мов із письмом справа наліво (RTL)',
+      'Виправлено пошук книг: якщо Google Books недоступний, автоматично шукає через Open Library',
+    ],
+    en: [
+      'Full UI translation into 22 languages (uk, en, de, fr, es, it, pt, pl, nl, sv, no, da, fi, cs, ro, hu, el, tr, ru + Arabic, Hebrew, Persian)',
+      'Right-to-left (RTL) layout support',
+      'Fixed book search: falls back to Open Library automatically when Google Books is unavailable',
+    ],
+  },
+  {
     version: '1.4.1',
     date: '2026-07-26',
     uk: [

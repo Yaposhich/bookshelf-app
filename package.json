@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-app",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Особиста бібліотека книг",
   "main": "electron/main.js",
   "scripts": {
