@@ -712,6 +712,13 @@ ipcMain.handle('updater:downloadNow', () => {
   return { ok: true }
 })
 
+// Unsigned macOS build can't stage updates via Squirrel — open the release
+// page in the browser so the user downloads the DMG manually.
+ipcMain.handle('updater:openDownloadPage', () => {
+  require('electron').shell.openExternal('https://github.com/Yaposhich/bookshelf-app/releases/latest')
+  return { ok: true }
+})
+
 ipcMain.handle('updater:installNow', () => {
   try {
     autoUpdater.quitAndInstall(false, true);

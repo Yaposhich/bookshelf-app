@@ -19,7 +19,9 @@ export default function UpdateBanner({ lang }) {
   if (status.state === 'not-available' || status.state === 'error') return null
 
   const handleDownload = () => {
-    window.api.downloadUpdate()
+    // Unsigned macOS build: open the release page so the user grabs the DMG.
+    window.api.openDownloadPage()
+    setDismissed(true)
   }
 
   const handleInstall = () => {

@@ -25,12 +25,12 @@
 }
 
 [data-theme="light"] {
-  --bg:        #f0ebe3;
-  --bg2:       #faf7f3;
-  --bg3:       #e8e1d8;
-  --bg4:       #dfd6c8;
-  --border:    #d8cfc5;
-  --border2:   #c8bdb0;
+  --bg:        #e7dbc2;
+  --bg2:       #f2e9d5;
+  --bg3:       #ddceb2;
+  --bg4:       #cebd9c;
+  --border:    #c9b492;
+  --border2:   #b7a47f;
   --text:      #2d1f0e;
   --text2:     #6b5040;
   --text3:     #9c8572;
@@ -48,7 +48,7 @@
 html, body, #root { height: 100%; }
 
 body {
-  font-family: 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Helvetica', 'Helvetica Neue', Arial, -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   font-size: 14px;

@@ -2,6 +2,20 @@
 // Shown in Settings → About → "What's new", and as a popup right after an update installs.
 export const CHANGELOG = [
   {
+    version: '1.4.0',
+    date: '2026-07-26',
+    uk: [
+      'Світла тема стала теплішою — м’якші кремово-пісочні тони',
+      'Шрифт інтерфейсу — Helvetica',
+      'Виправлено кнопку завантаження оновлення — тепер відкриває сторінку релізу з DMG',
+    ],
+    en: [
+      'Warmer light theme — softer cream/sand tones',
+      'Interface font set to Helvetica',
+      'Fixed the update download button — now opens the release page with the DMG',
+    ],
+  },
+  {
     version: '1.1.1',
     date: '2026-06-22',
     uk: [
