@@ -101,6 +101,7 @@ export default function BookModal({ book, lang, onSave, onClose }) {
   const [tab, setTab]             = useState('search')
   const [source, setSource]       = useState('google')
   const [emojiOpen, setEmojiOpen] = useState(false)
+  const [hoverRating, setHoverRating] = useState(0)
   const tagRef   = useRef()
   const timerRef = useRef()
 
@@ -408,12 +409,26 @@ export default function BookModal({ book, lang, onSave, onClose }) {
             {form.status==='read' && (<>
               <div className="form-group">
                 <label>{t.labelRating}</label>
-                <div className="rating-picker">
-                  {Array.from({length:10},(_,i)=>i+1).map(n=>(
-                    <button key={n} className={`rating-pick ${n<=form.rating?'active':''}`} onClick={()=>set('rating',form.rating===n?0:n)}>{n}</button>
-                  ))}
-                  {form.rating>0&&<span style={{fontSize:13,fontWeight:600,color:'var(--purple)',alignSelf:'center',marginLeft:6}}>{form.rating}/10</span>}
-                </div>
+                {(() => {
+                  const shown = hoverRating || form.rating
+                  const tone = shown <= 3 ? 'var(--red)' : shown <= 6 ? 'var(--amber)' : 'var(--green)'
+                  return (
+                    <div className="rating10" style={{ '--tone': tone }}>
+                      <div className="rating10-track" onMouseLeave={() => setHoverRating(0)}>
+                        {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
+                          <button key={n} type="button"
+                            className={`rating10-seg${n <= shown ? ' on' : ''}`}
+                            onMouseEnter={() => setHoverRating(n)}
+                            onClick={() => set('rating', form.rating === n ? 0 : n)}
+                            aria-label={`${n}/10`}>{n}</button>
+                        ))}
+                      </div>
+                      <div className="rating10-value">
+                        {shown ? <><b>{shown}</b><span>/10</span></> : <span className="rating10-dash">—</span>}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
               <div className="form-group">
                 <label>{t.labelReadingLanguage}</label>
