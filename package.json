@@ -15,6 +15,7 @@
   "build": {
     "appId": "com.bookshelf.app",
     "productName": "Bookshelf",
+    "afterPack": "scripts/afterPack.js",
     "asar": true,
     "asarUnpack": [
       "node_modules/better-sqlite3/**/*"
