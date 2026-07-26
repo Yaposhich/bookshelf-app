@@ -429,6 +429,21 @@ body {
   box-sizing: border-box;
 }
 
+/* Modals that delegate scrolling to an inner .modal-scroll: the outer .modal
+   clips with overflow:hidden so its rounded corners cut the scrollbar cleanly
+   instead of letting it poke past the edge. */
+.modal.has-scroll {
+  padding: 0;
+  overflow: hidden;
+}
+.modal.has-scroll .modal-scroll {
+  max-height: calc(90vh - 2px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 20px 24px 24px;
+  scrollbar-gutter: stable;
+}
+
 .modal-header {
   display: flex;
   align-items: center;

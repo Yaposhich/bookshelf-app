@@ -204,7 +204,7 @@ export default function BookModal({ book, lang, onSave, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" style={{maxWidth:580}} onClick={e=>e.stopPropagation()}>
+      <div className="modal has-scroll" style={{maxWidth:580}} onClick={e=>e.stopPropagation()}>
         <div className="modal-scroll">
         <div className="modal-header">
           <h2>{book ? t.editBookTitle : t.addBookTitle}</h2>

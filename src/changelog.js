@@ -8,11 +8,13 @@ export const CHANGELOG = [
       'Повний переклад інтерфейсу на 22 мови (uk, en, de, fr, es, it, pt, pl, nl, sv, no, da, fi, cs, ro, hu, el, tr, ru + арабська, іврит, фарсі)',
       'Підтримка мов із письмом справа наліво (RTL)',
       'Виправлено пошук книг: якщо Google Books недоступний, автоматично шукає через Open Library',
+      'Виправлено скролбар у вікні додавання книги (більше не вилазить за край)',
     ],
     en: [
       'Full UI translation into 22 languages (uk, en, de, fr, es, it, pt, pl, nl, sv, no, da, fi, cs, ro, hu, el, tr, ru + Arabic, Hebrew, Persian)',
       'Right-to-left (RTL) layout support',
       'Fixed book search: falls back to Open Library automatically when Google Books is unavailable',
+      'Fixed the scrollbar in the Add Book window (no longer overflows the edge)',
     ],
   },
   {
